@@ -1,0 +1,8 @@
+node_modules/
+build/
+.dart_tool/
+.packages
+.flutter-plugins*
+pubspec.lock
+.dev.vars
+.wrangler/

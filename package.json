@@ -1,0 +1,16 @@
+{
+  "name": "doktanet-api",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^3.90.0"
+  },
+  "scripts": {
+    "db:setup": "node db-setup.mjs",
+    "db:seed": "node db-setup.mjs seed",
+    "db:schema": "node db-setup.mjs schema"
+  }
+}

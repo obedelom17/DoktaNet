@@ -1,0 +1,9 @@
+{
+  "name": "DoktaNet",
+  "short_name": "DoktaNet",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0B3D2E",
+  "theme_color": "#0B3D2E",
+  "description": "Téléconsultation et parcours de soins connectés au Togo. / Telehealth and connected care in Togo."
+}

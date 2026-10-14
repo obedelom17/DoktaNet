@@ -1,0 +1,9 @@
+DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
+JWT_SECRET=changez-moi-chaine-aleatoire-longue
+PAY_SANDBOX=1
+PAY_WEBHOOK_SECRET=changez-moi
+COMMISSION_PCT=10
+# DAILY_API_KEY=optionnel (sinon Jitsi est utilisé)
+GROQ_API_KEY=gsk_votre_cle_groq
+GROQ_MODEL=openai/gpt-oss-20b
+REQUIRE_2FA=0
