@@ -13,7 +13,7 @@ class AdminHome extends StatelessWidget {
         TabDef("Comptes", Icons.manage_accounts_outlined, _Users()),
         TabDef("Litiges", Icons.flag_outlined, _Reports()),
         TabDef("Statistiques", Icons.bar_chart_rounded, _Stats()),
-        TabDef("Assistant", Icons.smart_toy_outlined, ChatPage()),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
       ]);
 }
 

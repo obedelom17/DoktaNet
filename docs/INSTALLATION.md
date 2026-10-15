@@ -6,11 +6,16 @@
 - Clé Groq (assistant IA). Optionnel : clé Daily.co
 
 ## 1. Base de données (Neon)
-1. Créer un projet Neon et copier la chaîne de connexion.
-2. Copier `.dev.vars.example` en `.dev.vars` et renseigner `DATABASE_URL` et `JWT_SECRET`.
-3. `npm install` puis `npm run db:setup` (schéma + données de test).
+Le projet est déjà lié (`.neon`, `neon.ts` : service Postgres seul).
+1. `npm install`
+2. `neon login` (ouvre le navigateur, à valider une fois).
+3. `neon deploy` : provisionne les services de `neon.ts`.
+4. `neon env pull` : écrit `DATABASE_URL` (pooled, pour l'API) et `DATABASE_URL_UNPOOLED` (direct, pour les migrations) dans `.env.local`.
+5. Compléter `.dev.vars` (copie de `.dev.vars.example`) avec `JWT_SECRET`, `GROQ_API_KEY`, etc. `npm run env:sync` recopie `DATABASE_URL` de `.env.local` vers `.dev.vars`.
+6. `npm run db:setup` (schéma + données de test). Les migrations utilisent `DATABASE_URL_UNPOOLED`.
    - Base déjà créée avant la finalisation : exécuter `migration_final.sql`.
    - Sans données de test : `npm run db:schema`.
+Alternative sans CLI : coller la chaîne de connexion dans `.dev.vars` (`DATABASE_URL=`).
 
 ## 2. Stockage des ordonnances (R2)
 Créer le bucket `doktanet-ordonnances`. Le binding `RX_BUCKET` est déclaré dans `wrangler.toml`.
@@ -31,8 +36,7 @@ Créer le bucket `doktanet-ordonnances`. Le binding `RX_BUCKET` est déclaré da
 ```
 npm install
 flutter pub get
-flutter build web
-npx wrangler pages dev build/web
+npm run dev   # synchronise .env.local, construit et lance wrangler
 ```
 Ouvrir http://localhost:8788. Comptes de test : mot de passe `Test1234!` (patient@, dr.kofi@, pharma.lome@, admin@ + `doktanet.test`).
 

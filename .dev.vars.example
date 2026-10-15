@@ -1,3 +1,4 @@
+# DATABASE_URL : `neon env pull` l'écrit dans .env.local ; `npm run env:sync` le recopie ici.
 DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/neondb?sslmode=require
 JWT_SECRET=changez-moi-chaine-aleatoire-longue
 PAY_SANDBOX=1

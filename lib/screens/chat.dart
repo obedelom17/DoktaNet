@@ -136,7 +136,7 @@ class _ChatPageState extends State<ChatPage> {
         width: 34,
         height: 34,
         decoration: const BoxDecoration(gradient: kBrandGradient, shape: BoxShape.circle),
-        child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 19),
+        child: const Center(child: LogoMark(size: 20)),
       );
 
   Widget _bubble(Map<String, String> m) {
@@ -196,7 +196,7 @@ class _ChatPageState extends State<ChatPage> {
     final s = suggestions;
     return ListView(padding: const EdgeInsets.all(20), children: [
       const SizedBox(height: 10),
-      const Reveal(child: Center(child: IconBadge(Icons.smart_toy_rounded, size: 80))),
+      const Reveal(child: Center(child: LogoMark(size: 84, onDark: false))),
       const SizedBox(height: 16),
       Reveal(
         index: 1,
@@ -229,19 +229,19 @@ class _ChatPageState extends State<ChatPage> {
         margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
         padding: const EdgeInsets.fromLTRB(14, 8, 6, 8),
         decoration: BoxDecoration(
-          color: const Color(0xFFFFF3D6),
+          color: const Color(0xFFFFEDE8),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(color: cAccent.withOpacity(0.4)),
         ),
         child: Row(children: [
-          const Icon(Icons.info_outline_rounded, color: Color(0xFF8A5A00), size: 20),
+          const Icon(Icons.info_outline_rounded, color: Color(0xFFB3412D), size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               patient
                   ? tr("Assistant IA : orientation et information, pas un diagnostic. Seul un médecin peut diagnostiquer et prescrire. Urgence : hôpital le plus proche.")
                   : tr("Assistant IA : vérifiez les informations avant toute décision."),
-              style: const TextStyle(fontSize: 12.5, color: Color(0xFF5A3C00)),
+              style: const TextStyle(fontSize: 12.5, color: Color(0xFF8A2F1C)),
             ),
           ),
           IconButton(tooltip: tr("Historique"), onPressed: _history, icon: const Icon(Icons.history_rounded)),

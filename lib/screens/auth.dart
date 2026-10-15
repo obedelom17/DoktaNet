@@ -60,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
       [Icons.videocam_rounded, "Consultation vidéo ou audio, même en 3G"],
       [Icons.description_rounded, "Ordonnance numérique signée par le médecin"],
       [Icons.local_pharmacy_rounded, "Pharmacies partenaires près de chez vous"],
-      [Icons.smart_toy_rounded, "Assistant IA pour vous orienter"],
+      [Icons.chat_bubble_rounded, "Assistant IA pour vous orienter"],
       [Icons.phone_android_rounded, "Paiement par T-Money et Flooz"],
     ];
     return Column(

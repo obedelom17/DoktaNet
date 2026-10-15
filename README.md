@@ -3,7 +3,7 @@
 Flutter Web + Cloudflare Pages Functions (API) + Neon (PostgreSQL) + Cloudflare R2.
 
 ## Mise en route
-1. Neon : créer un projet, mettre `DATABASE_URL` dans `.dev.vars`, puis `npm install && npm run db:setup` (schéma + données de test, comptes `*.doktanet.test`, mot de passe `Test1234!`). Sans données de test : `npm run db:schema`. Base déjà créée : `migration_chat.sql` puis `migration_final.sql`.
+1. Neon : `npm install`, `neon login`, `neon deploy`, `neon env pull` (écrit `.env.local`), puis `npm run db:setup` (schéma + données de test, comptes `*.doktanet.test`, mot de passe `Test1234!`). Sans données de test : `npm run db:schema`. Base déjà créée : `migration_chat.sql` puis `migration_final.sql`.
 2. R2 : créer le bucket `doktanet-ordonnances`.
 3. Pages : créer le projet `doktanet`. Variables (secrets) : `DATABASE_URL`, `JWT_SECRET`, `COMMISSION_PCT`, `PAY_SANDBOX` (`1` en test), `PAY_WEBHOOK_SECRET`, `DAILY_API_KEY` (optionnel), `REQUIRE_2FA` (`1` = 2FA obligatoire médecins/admin), `GROQ_API_KEY`, `GROQ_MODEL` (défaut `openai/gpt-oss-20b`). Lier le bucket R2 au binding `RX_BUCKET`.
 4. GitHub : secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`. Push sur `main` : build Flutter + déploiement automatique.

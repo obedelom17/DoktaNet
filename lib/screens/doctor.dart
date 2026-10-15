@@ -15,7 +15,7 @@ class DoctorHome extends StatelessWidget {
         TabDef("Agenda", Icons.event_note_outlined, _Agenda()),
         TabDef("Disponibilités", Icons.schedule_rounded, _Availability()),
         TabDef("Congés", Icons.beach_access_outlined, _Blocks()),
-        TabDef("Assistant", Icons.smart_toy_outlined, ChatPage()),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
         TabDef("Profil", Icons.person_outline, _DoctorProfile()),
       ]);
 }

@@ -6,33 +6,32 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="DoktaNet - téléconsultation au Togo / telehealth in Togo">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b3d2e">
+  <meta name="theme-color" content="#0a3b50">
   <title>DoktaNet</title>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
   <link rel="manifest" href="manifest.json">
   <style>
-    html, body { margin: 0; height: 100%; background: #0b3d2e; }
+    html, body { margin: 0; height: 100%; background: #0a3b50; }
     #splash {
       position: fixed; inset: 0; z-index: 10; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 18px;
-      background: radial-gradient(circle at 20% 15%, #16805a 0%, #0b3d2e 55%, #062b20 100%);
+      background: radial-gradient(circle at 20% 15%, #0e5976 0%, #0a3b50 55%, #062b3c 100%);
       font-family: Roboto, "Segoe UI", Arial, sans-serif; color: #fff;
       transition: opacity .5s ease;
     }
     #splash.hide { opacity: 0; pointer-events: none; }
-    #splash .logo {
-      width: 84px; height: 84px; border-radius: 26px; display: grid; place-items: center;
-      background: linear-gradient(135deg, #f5a623, #ffc857); color: #0b3d2e; font-size: 46px; font-weight: 800;
-      box-shadow: 0 10px 40px rgba(245,166,35,.45); animation: pulse 1.6s ease-in-out infinite;
-    }
+    #splash .logo { width: 96px; height: 96px; animation: pulse 1.6s ease-in-out infinite; }
+    #splash .logo img { width: 100%; height: 100%; display: block; }
     #splash h1 { margin: 0; font-size: 34px; letter-spacing: -.5px; }
     #splash .bar { width: 130px; height: 4px; border-radius: 4px; background: rgba(255,255,255,.2); overflow: hidden; }
-    #splash .bar i { display: block; width: 40%; height: 100%; background: #f5a623; border-radius: 4px; animation: slide 1.2s ease-in-out infinite; }
+    #splash .bar i { display: block; width: 40%; height: 100%; background: #ff6f59; border-radius: 4px; animation: slide 1.2s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
     @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }
   </style>
 </head>
 <body>
-  <div id="splash"><div class="logo">+</div><h1>DoktaNet</h1><div class="bar"><i></i></div></div>
+  <div id="splash"><div class="logo"><img src="icons/logo-white.png" alt=""></div><h1>DoktaNet</h1><div class="bar"><i></i></div></div>
   <script>
     window.addEventListener('flutter-first-frame', function () {
       var s = document.getElementById('splash');

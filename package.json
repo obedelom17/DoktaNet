@@ -3,14 +3,20 @@
   "private": true,
   "version": "0.1.0",
   "dependencies": {
+    "@neon/config": "^1.9.1",
+    "@neon/env": "^1.6.2",
     "@neondatabase/serverless": "^1.0.0"
   },
   "devDependencies": {
     "wrangler": "^3.90.0"
   },
   "scripts": {
+    "build": "flutter build web --release",
+    "check:api": "node -e \"require('fs').copyFileSync('functions/api/[[path]].js','/tmp/_api.mjs')\" && node --check /tmp/_api.mjs",
     "db:setup": "node db-setup.mjs",
     "db:seed": "node db-setup.mjs seed",
-    "db:schema": "node db-setup.mjs schema"
+    "db:schema": "node db-setup.mjs schema",
+    "env:sync": "node sync-env.mjs",
+    "dev": "node sync-env.mjs && flutter build web && wrangler pages dev build/web"
   }
 }

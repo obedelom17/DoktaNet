@@ -90,7 +90,7 @@ class _AccountPageState extends State<AccountPage> {
         appBar: gradientAppBar(tr("Mon compte")),
         body: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFE7F3EE), cBg]),
+            gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFFE2EFF4), cBg]),
           ),
           child: pageWrap(
             ListView(padding: const EdgeInsets.all(16), children: [

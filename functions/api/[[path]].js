@@ -39,10 +39,10 @@ const rxSign = async (env, r) => hex(await crypto.subtle.sign('HMAC', await hkey
 function rxHtml(r, origin) {
   const rows = r.items.map((i) => `<tr><td>${esc(i.name)}</td><td>${esc(i.dosage)}</td><td>${esc(i.duration)}</td></tr>`).join('');
   return `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Ordonnance ${esc(r.code)}</title>
-<style>body{font-family:Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#1a3c2e}
-h1{color:#1a3c2e;border-bottom:3px solid #e8a317;padding-bottom:8px}table{width:100%;border-collapse:collapse;margin:16px 0}
-th,td{border:1px solid #2d6a4f;padding:8px;text-align:left}th{background:#2d6a4f;color:#fff}
-.sig{font-size:12px;word-break:break-all;color:#555;margin-top:24px}button{padding:10px 18px;background:#2d6a4f;color:#fff;border:0;border-radius:8px;font-size:16px}
+<style>body{font-family:Arial,sans-serif;max-width:760px;margin:24px auto;padding:0 16px;color:#0a3b50}
+h1{color:#0a3b50;border-bottom:3px solid #ff6f59;padding-bottom:8px}table{width:100%;border-collapse:collapse;margin:16px 0}
+th,td{border:1px solid #0e5976;padding:8px;text-align:left}th{background:#0e5976;color:#fff}
+.sig{font-size:12px;word-break:break-all;color:#555;margin-top:24px}button{padding:10px 18px;background:#0e5976;color:#fff;border:0;border-radius:8px;font-size:16px}
 @media print{button{display:none}}</style></head><body>
 <h1>DoktaNet - Ordonnance numérique</h1>
 <p><b>Code :</b> ${esc(r.code)}<br><b>Date :</b> ${esc(new Date(r.created_at).toISOString().slice(0, 16).replace('T', ' '))} UTC</p>

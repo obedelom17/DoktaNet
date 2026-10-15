@@ -16,7 +16,7 @@ class PatientHome extends StatelessWidget {
         TabDef("Accueil", Icons.home_rounded, _Dashboard()),
         TabDef("Médecins", Icons.medical_services_outlined, _Doctors()),
         TabDef("Pharmacies", Icons.local_pharmacy_outlined, PharmacyList()),
-        TabDef("Assistant", Icons.smart_toy_outlined, ChatPage()),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
         TabDef("Profil", Icons.person_outline, _PatientProfile()),
       ]);
 }
@@ -81,7 +81,7 @@ class _Dashboard extends StatelessWidget {
               Row(children: [
                 _quick(c, 1, Icons.medical_services_rounded, kBrandGradient, "Médecins", 1),
                 _quick(c, 2, Icons.local_pharmacy_rounded, kGoldGradient, "Pharmacies", 2),
-                _quick(c, 3, Icons.smart_toy_rounded, kBrandGradient, "Assistant", 3),
+                _quick(c, 3, Icons.chat_bubble_rounded, kBrandGradient, "Assistant", 3),
               ]),
               Row(children: [
                 _mini(4, Icons.event_available_rounded, upcoming, "À venir"),

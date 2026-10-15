@@ -1,34 +1,35 @@
 import 'package:flutter/material.dart';
 
-// Palette DoktaNet : vert émeraude (santé), menthe (vitalité), or (chaleur togolaise).
-const cDark = Color(0xFF0B3D2E);
-const cMid = Color(0xFF16805A);
-const cMint = Color(0xFF3DDC97);
-const cTeal = Color(0xFF0E9AA7);
-const cAccent = Color(0xFFF5A623);
-const cBg = Color(0xFFF2F8F5);
-const cInk = Color(0xFF12221B);
-const cMuted = Color(0xFF5B6E65);
+// Palette DoktaNet : bleu du logo #0E5976 (confiance), cyan (clarté), corail (chaleur). Distincte de FiscAI (vert/or).
+const cDark = Color(0xFF0A3B50);
+const cMid = Color(0xFF0E5976);
+const cMint = Color(0xFF5CC8E0);
+const cTeal = Color(0xFF1A8FB5);
+const cOk = Color(0xFF1E9E6A); // succès (statuts terminé / payé)
+const cAccent = Color(0xFFFF6F59);
+const cBg = Color(0xFFF1F6F9);
+const cInk = Color(0xFF0F2230);
+const cMuted = Color(0xFF5A6E7C);
 
 const kHeaderGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFF0B3D2E), Color(0xFF16805A)],
+  colors: [Color(0xFF0A3B50), Color(0xFF0E5976)],
 );
 const kBrandGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFF16805A), Color(0xFF0E9AA7)],
+  colors: [Color(0xFF0E5976), Color(0xFF1A8FB5)],
 );
 const kGoldGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFFF5A623), Color(0xFFFFC857)],
+  colors: [Color(0xFFFF6F59), Color(0xFFFF9E7A)],
 );
 const kHeroGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [Color(0xFF062B20), Color(0xFF0B3D2E), Color(0xFF16805A)],
+  colors: [Color(0xFF062B3C), Color(0xFF0A3B50), Color(0xFF0E5976)],
 );
 
 ThemeData buildTheme() {

@@ -12,7 +12,7 @@ class PharmacyHome extends StatelessWidget {
   Widget build(BuildContext context) => const Shell(title: "Pharmacie", tabs: [
         TabDef("Commandes", Icons.receipt_long_outlined, _Orders()),
         TabDef("Stock", Icons.inventory_2_outlined, _Stock()),
-        TabDef("Assistant", Icons.smart_toy_outlined, ChatPage()),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
         TabDef("Profil", Icons.storefront_outlined, _PharmacyProfile()),
       ]);
 }

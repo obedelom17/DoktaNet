@@ -101,11 +101,11 @@ class _ThreadPageState extends State<ThreadPage> {
           Column(children: [
             Container(
               width: double.infinity,
-              color: const Color(0xFFFFF3D6),
+              color: const Color(0xFFFFEDE8),
               padding: const EdgeInsets.all(10),
               child: Text(
                 tr("Messagerie sécurisée entre patient et médecin. En cas d'urgence, rendez-vous à l'hôpital le plus proche."),
-                style: const TextStyle(fontSize: 13, color: Color(0xFF5A3C00)),
+                style: const TextStyle(fontSize: 13, color: Color(0xFF8A2F1C)),
               ),
             ),
             Expanded(

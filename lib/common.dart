@@ -56,7 +56,7 @@ Color _statusColor(String s) {
     case 'delivered':
     case 'paid':
     case 'resolved':
-      return cMid;
+      return cOk;
     case 'cancelled':
     case 'unpaid':
       return Colors.red.shade700;
@@ -651,17 +651,14 @@ class _HeroBannerState extends State<HeroBanner> with SingleTickerProviderStateM
 
 class LogoMark extends StatelessWidget {
   final double size;
-  const LogoMark({super.key, this.size = 36});
+  final bool onDark;
+  const LogoMark({super.key, this.size = 36, this.onDark = true});
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => Image.asset(
+        onDark ? 'assets/images/logo_white.png' : 'assets/images/logo.png',
         width: size,
         height: size,
-        decoration: BoxDecoration(
-          gradient: kGoldGradient,
-          borderRadius: BorderRadius.circular(size * 0.3),
-          boxShadow: [BoxShadow(color: cAccent.withOpacity(0.4), blurRadius: 12, offset: const Offset(0, 4))],
-        ),
-        child: Icon(Icons.health_and_safety_rounded, color: cDark, size: size * 0.62),
+        filterQuality: FilterQuality.high,
       );
 }
 
@@ -899,7 +896,7 @@ class _ShellState extends State<Shell> {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0xFFE7F3EE), cBg],
+          colors: [Color(0xFFE2EFF4), cBg],
         ),
       ),
       child: ShellScope(go: go, child: page),

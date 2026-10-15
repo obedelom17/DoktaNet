@@ -6,3 +6,7 @@ build/
 pubspec.lock
 .dev.vars
 .wrangler/
+.neon
+.env
+.env.local
+.env.*.local
