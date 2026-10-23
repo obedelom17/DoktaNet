@@ -24,11 +24,17 @@ class _ChatPageState extends State<ChatPage> {
   List<String> get suggestions {
     switch (role) {
       case 'doctor':
-        return ["Mon agenda des prochains jours", "Résume le dossier de mon prochain patient"];
+        return [
+          "Mon agenda des prochains jours",
+          "Résume le dossier de mon prochain patient"
+        ];
       case 'pharmacy':
         return ["Commandes en attente", "Médicaments en stock faible"];
       case 'admin':
-        return ["Statistiques de la plateforme", "Comptes en attente de validation"];
+        return [
+          "Statistiques de la plateforme",
+          "Comptes en attente de validation"
+        ];
       default:
         return [
           "J'ai de la fièvre et mal à la tête depuis 2 jours",
@@ -119,11 +125,15 @@ class _ChatPageState extends State<ChatPage> {
         builder: (d) => SimpleDialog(
           title: Text(tr("Conversations")),
           children: [
-            if (list.isEmpty) Padding(padding: const EdgeInsets.all(16), child: Text(tr("Aucune conversation."))),
+            if (list.isEmpty)
+              Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(tr("Aucune conversation."))),
             for (final c in list)
               SimpleDialogOption(
                 onPressed: () => Navigator.pop(d, '${c['id']}'),
-                child: Text('${fmtDt(c['created_at'])} - ${c['title'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: Text('${fmtDt(c['created_at'])} - ${c['title'] ?? ''}',
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
               ),
           ],
         ),
@@ -135,7 +145,8 @@ class _ChatPageState extends State<ChatPage> {
   Widget _botAvatar() => Container(
         width: 34,
         height: 34,
-        decoration: const BoxDecoration(gradient: kBrandGradient, shape: BoxShape.circle),
+        decoration: const BoxDecoration(
+            gradient: kBrandGradient, shape: BoxShape.circle),
         child: const Center(child: LogoMark(size: 20)),
       );
 
@@ -153,18 +164,25 @@ class _ChatPageState extends State<ChatPage> {
           bottomLeft: Radius.circular(u ? 20 : 5),
           bottomRight: Radius.circular(u ? 5 : 20),
         ),
-        border: u ? null : Border.all(color: cDark.withOpacity(0.08)),
-        boxShadow: [BoxShadow(color: cDark.withOpacity(0.07), blurRadius: 12, offset: const Offset(0, 5))],
+        border: u ? null : Border.all(color: cDark.withValues(alpha: 0.08)),
+        boxShadow: [
+          BoxShadow(
+              color: cDark.withValues(alpha: 0.07),
+              blurRadius: 12,
+              offset: const Offset(0, 5))
+        ],
       ),
       child: SelectableText(m['content'] ?? '',
-          style: TextStyle(color: u ? Colors.white : cInk, fontSize: 15.5, height: 1.4)),
+          style: TextStyle(
+              color: u ? Colors.white : cInk, fontSize: 15.5, height: 1.4)),
     );
     return Reveal(
       dy: 14,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),
         child: Row(
-          mainAxisAlignment: u ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment:
+              u ? MainAxisAlignment.end : MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             if (!u) ...[_botAvatar(), const SizedBox(width: 8)],
@@ -185,7 +203,7 @@ class _ChatPageState extends State<ChatPage> {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: cDark.withOpacity(0.08)),
+              border: Border.all(color: cDark.withValues(alpha: 0.08)),
             ),
             child: const TypingDots(),
           ),
@@ -202,21 +220,28 @@ class _ChatPageState extends State<ChatPage> {
         index: 1,
         child: Text(tr("Comment puis-je vous aider ?"),
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: cDark)),
+            style: const TextStyle(
+                fontSize: 24, fontWeight: FontWeight.w800, color: cDark)),
       ),
       const SizedBox(height: 18),
-      Wrap(alignment: WrapAlignment.center, spacing: 10, runSpacing: 10, children: [
-        for (var i = 0; i < s.length; i++)
-          Reveal(
-            index: 2 + i,
-            child: ActionChip(
-              avatar: const Icon(Icons.auto_awesome_rounded, size: 17, color: cAccent),
-              label: Text(tr(s[i])),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-              onPressed: () => _send(tr(s[i])),
-            ),
-          ),
-      ]),
+      Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            for (var i = 0; i < s.length; i++)
+              Reveal(
+                index: 2 + i,
+                child: ActionChip(
+                  avatar: const Icon(Icons.auto_awesome_rounded,
+                      size: 17, color: cAccent),
+                  label: Text(tr(s[i])),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                  onPressed: () => _send(tr(s[i])),
+                ),
+              ),
+          ]),
     ]);
   }
 
@@ -231,30 +256,42 @@ class _ChatPageState extends State<ChatPage> {
         decoration: BoxDecoration(
           color: const Color(0xFFFFEDE8),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: cAccent.withOpacity(0.4)),
+          border: Border.all(color: cAccent.withValues(alpha: 0.4)),
         ),
         child: Row(children: [
-          const Icon(Icons.info_outline_rounded, color: Color(0xFFB3412D), size: 20),
+          const Icon(Icons.info_outline_rounded,
+              color: Color(0xFFB3412D), size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               patient
-                  ? tr("Assistant IA : orientation et information, pas un diagnostic. Seul un médecin peut diagnostiquer et prescrire. Urgence : hôpital le plus proche.")
-                  : tr("Assistant IA : vérifiez les informations avant toute décision."),
+                  ? tr(
+                      "Assistant IA : orientation et information, pas un diagnostic. Seul un médecin peut diagnostiquer et prescrire. Urgence : hôpital le plus proche.")
+                  : tr(
+                      "Assistant IA : vérifiez les informations avant toute décision."),
               style: const TextStyle(fontSize: 12.5, color: Color(0xFF8A2F1C)),
             ),
           ),
-          IconButton(tooltip: tr("Historique"), onPressed: _history, icon: const Icon(Icons.history_rounded)),
-          IconButton(tooltip: tr("Nouvelle conversation"), onPressed: _new, icon: const Icon(Icons.add_comment_outlined)),
+          IconButton(
+              tooltip: tr("Historique"),
+              onPressed: _history,
+              icon: const Icon(Icons.history_rounded)),
+          IconButton(
+              tooltip: tr("Nouvelle conversation"),
+              onPressed: _new,
+              icon: const Icon(Icons.add_comment_outlined)),
         ]),
       ),
       Expanded(
         child: msgs.isEmpty
             ? _welcome()
-            : ListView(controller: scroll, padding: const EdgeInsets.all(16), children: [
-                for (final m in msgs) _bubble(m),
-                if (busy) _typing(),
-              ]),
+            : ListView(
+                controller: scroll,
+                padding: const EdgeInsets.all(16),
+                children: [
+                    for (final m in msgs) _bubble(m),
+                    if (busy) _typing(),
+                  ]),
       ),
       Container(
         margin: const EdgeInsets.fromLTRB(12, 4, 12, 12),
@@ -262,7 +299,12 @@ class _ChatPageState extends State<ChatPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
-          boxShadow: [BoxShadow(color: cDark.withOpacity(0.12), blurRadius: 22, offset: const Offset(0, 8))],
+          boxShadow: [
+            BoxShadow(
+                color: cDark.withValues(alpha: 0.12),
+                blurRadius: 22,
+                offset: const Offset(0, 8))
+          ],
         ),
         child: Row(children: [
           Expanded(
@@ -283,7 +325,8 @@ class _ChatPageState extends State<ChatPage> {
           ),
           const SizedBox(width: 6),
           IconButton.filled(
-            style: IconButton.styleFrom(backgroundColor: cMid, fixedSize: const Size(48, 48)),
+            style: IconButton.styleFrom(
+                backgroundColor: cMid, fixedSize: const Size(48, 48)),
             onPressed: busy ? null : () => _send(),
             icon: const Icon(Icons.send_rounded),
           ),

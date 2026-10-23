@@ -23,16 +23,27 @@ class DoctorHome extends StatelessWidget {
 class _Agenda extends StatelessWidget {
   const _Agenda();
 
-  Future<void> _notes(BuildContext context, dynamic a, VoidCallback reload) async {
+  Future<void> _notes(
+      BuildContext context, dynamic a, VoidCallback reload) async {
     final ctl = TextEditingController(text: '${a['notes'] ?? ''}');
     final ok = await showDialog<bool>(
       context: context,
       builder: (d) => AlertDialog(
         title: Text(tr("Notes de consultation")),
-        content: SizedBox(width: 400, child: TextField(controller: ctl, minLines: 4, maxLines: 8, decoration: const InputDecoration())),
+        content: SizedBox(
+            width: 400,
+            child: TextField(
+                controller: ctl,
+                minLines: 4,
+                maxLines: 8,
+                decoration: const InputDecoration())),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(d, false), child: Text(tr("Annuler"))),
-          ElevatedButton(onPressed: () => Navigator.pop(d, true), child: Text(tr("Enregistrer"))),
+          TextButton(
+              onPressed: () => Navigator.pop(d, false),
+              child: Text(tr("Annuler"))),
+          ElevatedButton(
+              onPressed: () => Navigator.pop(d, true),
+              child: Text(tr("Enregistrer"))),
         ],
       ),
     );
@@ -64,38 +75,56 @@ class _Agenda extends StatelessWidget {
               for (final x in rx)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8),
-                  child: Text('${fmtDt(x['created_at'])} - Dr ${x['doctor_name']}\n${itemsText(x['items'])}'),
+                  child: Text(
+                      '${fmtDt(x['created_at'])} - Dr ${x['doctor_name']}\n${itemsText(x['items'])}'),
                 ),
             ]),
           ),
-          actions: [TextButton(onPressed: () => Navigator.pop(d), child: Text(tr("Fermer")))],
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(d), child: Text(tr("Fermer")))
+          ],
         ),
       );
     });
   }
 
-  Widget _card(BuildContext c, dynamic a, int i, VoidCallback reload) => AppCard(
+  Widget _card(BuildContext c, dynamic a, int i, VoidCallback reload) =>
+      AppCard(
         index: i,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             InitialsAvatar('${a['patient_name']}'),
             const SizedBox(width: 14),
             Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${a['patient_name']}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: cDark)),
-                Text(fmtDt(a['starts_at']), style: const TextStyle(color: cMuted)),
-              ]),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${a['patient_name']}',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 17,
+                            color: cDark)),
+                    Text(fmtDt(a['starts_at']),
+                        style: const TextStyle(color: cMuted)),
+                  ]),
             ),
             chip('${a['status']}'),
           ]),
-          if ((a['notes'] ?? '').toString().isNotEmpty) InfoRow(Icons.sticky_note_2_outlined, tr("Notes : {n}", {'n': a['notes']})),
+          if ((a['notes'] ?? '').toString().isNotEmpty)
+            InfoRow(Icons.sticky_note_2_outlined,
+                tr("Notes : {n}", {'n': a['notes']})),
           if (a['status'] != 'cancelled')
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
                 icon: const Icon(Icons.forum_outlined),
                 onPressed: () => Navigator.push(
-                    c, MaterialPageRoute(builder: (_) => ThreadPage(apptId: '${a['id']}', title: '${a['patient_name']}'))),
+                    c,
+                    MaterialPageRoute(
+                        builder: (_) => ThreadPage(
+                            apptId: '${a['id']}',
+                            title: '${a['patient_name']}'))),
                 label: Text(tr("Messages")),
               ),
             ),
@@ -107,19 +136,27 @@ class _Agenda extends StatelessWidget {
                   icon: const Icon(Icons.videocam_rounded),
                   onPressed: () async {
                     await guard(c, () async {
-                      await Api.post('/appointments/${a['id']}/status', {'status': 'in_progress'});
+                      await Api.post('/appointments/${a['id']}/status',
+                          {'status': 'in_progress'});
                     });
                     if (c.mounted) await openRoom(c, '${a['id']}');
                     reload();
                   },
                   label: Text(tr("Lancer")),
                 ),
-                OutlinedButton.icon(icon: const Icon(Icons.folder_shared_outlined), onPressed: () => _record(c, a), label: Text(tr("Dossier"))),
-                OutlinedButton.icon(icon: const Icon(Icons.edit_note_rounded), onPressed: () => _notes(c, a, reload), label: Text(tr("Notes"))),
+                OutlinedButton.icon(
+                    icon: const Icon(Icons.folder_shared_outlined),
+                    onPressed: () => _record(c, a),
+                    label: Text(tr("Dossier"))),
+                OutlinedButton.icon(
+                    icon: const Icon(Icons.edit_note_rounded),
+                    onPressed: () => _notes(c, a, reload),
+                    label: Text(tr("Notes"))),
                 OutlinedButton.icon(
                   icon: const Icon(Icons.description_outlined),
                   onPressed: () async {
-                    await Navigator.push(c, MaterialPageRoute(builder: (_) => RxForm(a)));
+                    await Navigator.push(
+                        c, MaterialPageRoute(builder: (_) => RxForm(a)));
                     reload();
                   },
                   label: Text(tr("Ordonnance")),
@@ -127,7 +164,8 @@ class _Agenda extends StatelessWidget {
                 OutlinedButton.icon(
                   icon: const Icon(Icons.task_alt_rounded),
                   onPressed: () => guard(c, () async {
-                    await Api.post('/appointments/${a['id']}/status', {'status': 'done'});
+                    await Api.post(
+                        '/appointments/${a['id']}/status', {'status': 'done'});
                     reload();
                   }),
                   label: Text(tr("Terminer")),
@@ -144,13 +182,19 @@ class _Agenda extends StatelessWidget {
           onRefresh: () async => reload(),
           child: ListView(padding: const EdgeInsets.all(16), children: [
             HeroBanner(
-              title: tr("Bonjour Dr {n}", {'n': session.user?['full_name'] ?? ''}),
-              subtitle: tr("{n} rendez-vous dans votre agenda.", {'n': appts.length}),
-              trailing: const Padding(padding: EdgeInsets.only(left: 12), child: PulseDot()),
+              title:
+                  tr("Bonjour Dr {n}", {'n': session.user?['full_name'] ?? ''}),
+              subtitle:
+                  tr("{n} rendez-vous dans votre agenda.", {'n': appts.length}),
+              trailing: const Padding(
+                  padding: EdgeInsets.only(left: 12), child: PulseDot()),
             ),
             sectionTitle("Rendez-vous", icon: Icons.event_note_rounded),
-            if (appts.isEmpty) const Empty("Aucun rendez-vous.", icon: Icons.event_busy_outlined),
-            for (var i = 0; i < appts.length; i++) _card(c, appts[i], i, reload),
+            if (appts.isEmpty)
+              const Empty("Aucun rendez-vous.",
+                  icon: Icons.event_busy_outlined),
+            for (var i = 0; i < appts.length; i++)
+              _card(c, appts[i], i, reload),
             const SizedBox(height: 20),
           ]),
         ),
@@ -186,7 +230,11 @@ class _RxFormState extends State<RxForm> {
     final items = <Map<String, String>>[];
     for (final r in rows) {
       if (r[0].text.trim().isNotEmpty) {
-        items.add({'name': r[0].text.trim(), 'dosage': r[1].text.trim(), 'duration': r[2].text.trim()});
+        items.add({
+          'name': r[0].text.trim(),
+          'dosage': r[1].text.trim(),
+          'duration': r[2].text.trim()
+        });
       }
     }
     if (items.isEmpty) {
@@ -195,7 +243,11 @@ class _RxFormState extends State<RxForm> {
     }
     setState(() => busy = true);
     await guard(context, () async {
-      await Api.post('/prescriptions', {'appointment_id': widget.appt['id'], 'items': items, 'notes': notes.text.trim()});
+      await Api.post('/prescriptions', {
+        'appointment_id': widget.appt['id'],
+        'items': items,
+        'notes': notes.text.trim()
+      });
       if (mounted) {
         toast(context, tr("Ordonnance signée et envoyée au patient"));
         Navigator.pop(context);
@@ -206,7 +258,8 @@ class _RxFormState extends State<RxForm> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: gradientAppBar(tr("Ordonnance - {n}", {'n': widget.appt['patient_name']})),
+        appBar: gradientAppBar(
+            tr("Ordonnance - {n}", {'n': widget.appt['patient_name']})),
         body: pageWrap(
           ListView(padding: const EdgeInsets.all(16), children: [
             for (var i = 0; i < rows.length; i++)
@@ -219,14 +272,22 @@ class _RxFormState extends State<RxForm> {
                       width: 30,
                       height: 30,
                       alignment: Alignment.center,
-                      decoration: const BoxDecoration(gradient: kBrandGradient, shape: BoxShape.circle),
-                      child: Text('${i + 1}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+                      decoration: const BoxDecoration(
+                          gradient: kBrandGradient, shape: BoxShape.circle),
+                      child: Text('${i + 1}',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800)),
                     ),
                     const SizedBox(width: 10),
-                    Expanded(child: tf(rows[i][0], "Médicament", icon: Icons.medication_outlined)),
+                    Expanded(
+                        child: tf(rows[i][0], "Médicament",
+                            icon: Icons.medication_outlined)),
                   ]),
                   Row(children: [
-                    Expanded(child: tf(rows[i][1], "Posologie (ex : 1 cp x 3/jour)")),
+                    Expanded(
+                        child:
+                            tf(rows[i][1], "Posologie (ex : 1 cp x 3/jour)")),
                     const SizedBox(width: 8),
                     Expanded(child: tf(rows[i][2], "Durée (ex : 5 jours)")),
                   ]),
@@ -234,12 +295,17 @@ class _RxFormState extends State<RxForm> {
               ),
             OutlinedButton.icon(
               icon: const Icon(Icons.add_rounded),
-              onPressed: () => setState(() => rows.add([TextEditingController(), TextEditingController(), TextEditingController()])),
+              onPressed: () => setState(() => rows.add([
+                    TextEditingController(),
+                    TextEditingController(),
+                    TextEditingController()
+                  ])),
               label: Text(tr("Ajouter un médicament")),
             ),
             const SizedBox(height: 14),
             tf(notes, "Remarques", lines: 3, icon: Icons.notes_rounded),
-            PrimaryButton("Signer et envoyer", icon: Icons.draw_rounded, busy: busy, onPressed: save),
+            PrimaryButton("Signer et envoyer",
+                icon: Icons.draw_rounded, busy: busy, onPressed: save),
             const SizedBox(height: 20),
           ]),
         ),
@@ -253,11 +319,21 @@ class _Availability extends StatefulWidget {
 }
 
 class _AvailabilityState extends State<_Availability> {
-  static const names = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+  static const names = [
+    "Dimanche",
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi"
+  ];
   static const order = [1, 2, 3, 4, 5, 6, 0];
   final on = List<bool>.filled(7, false);
-  final s = List<TextEditingController>.generate(7, (_) => TextEditingController(text: '08:00'));
-  final e = List<TextEditingController>.generate(7, (_) => TextEditingController(text: '17:00'));
+  final s = List<TextEditingController>.generate(
+      7, (_) => TextEditingController(text: '08:00'));
+  final e = List<TextEditingController>.generate(
+      7, (_) => TextEditingController(text: '17:00'));
   bool ready = false;
 
   @override
@@ -307,7 +383,9 @@ class _AvailabilityState extends State<_Availability> {
       sectionTitle("Disponibilités", icon: Icons.schedule_rounded),
       Padding(
         padding: const EdgeInsets.only(bottom: 14),
-        child: Text(tr("Horaires de consultation (créneaux de 30 min, heure de Lomé)."), style: const TextStyle(color: cMuted)),
+        child: Text(
+            tr("Horaires de consultation (créneaux de 30 min, heure de Lomé)."),
+            style: const TextStyle(color: cMuted)),
       ),
       for (var k = 0; k < order.length; k++)
         AppCard(
@@ -318,8 +396,10 @@ class _AvailabilityState extends State<_Availability> {
               child: SwitchListTile(
                 value: on[order[k]],
                 onChanged: (v) => setState(() => on[order[k]] = v),
-                activeColor: cMid,
-                title: Text(tr(names[order[k]]), style: const TextStyle(fontWeight: FontWeight.w700, color: cDark)),
+                activeThumbColor: cMid,
+                title: Text(tr(names[order[k]]),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, color: cDark)),
                 contentPadding: EdgeInsets.zero,
               ),
             ),
@@ -342,7 +422,12 @@ class _AvailabilityState extends State<_Availability> {
         onPressed: () => guard(context, () async {
           final slots = [
             for (final w in order)
-              if (on[w]) {'weekday': w, 'start': s[w].text.trim(), 'end': e[w].text.trim()}
+              if (on[w])
+                {
+                  'weekday': w,
+                  'start': s[w].text.trim(),
+                  'end': e[w].text.trim()
+                }
           ];
           await Api.put('/doctor/availability', {'slots': slots});
           if (mounted) toast(context, tr("Disponibilités enregistrées"));
@@ -360,8 +445,12 @@ class _DoctorProfile extends StatefulWidget {
 }
 
 class _DoctorProfileState extends State<_DoctorProfile> {
-  final spec = TextEditingController(), city = TextEditingController(), fee = TextEditingController();
-  final exp = TextEditingController(), lang = TextEditingController(), bio = TextEditingController();
+  final spec = TextEditingController(),
+      city = TextEditingController(),
+      fee = TextEditingController();
+  final exp = TextEditingController(),
+      lang = TextEditingController(),
+      bio = TextEditingController();
   bool ready = false;
 
   @override
@@ -406,9 +495,13 @@ class _DoctorProfileState extends State<_DoctorProfile> {
           InitialsAvatar(name, size: 64),
           const SizedBox(width: 16),
           Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Dr $name', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: cDark)),
-              Text('${session.user?['email'] ?? ''}', style: const TextStyle(color: cMuted)),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Dr $name',
+                  style: const TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.w800, color: cDark)),
+              Text('${session.user?['email'] ?? ''}',
+                  style: const TextStyle(color: cMuted)),
             ]),
           ),
         ]),
@@ -419,8 +512,11 @@ class _DoctorProfileState extends State<_DoctorProfile> {
         child: Column(children: [
           tf(spec, "Spécialité", icon: Icons.medical_information_outlined),
           tf(city, "Ville", icon: Icons.location_city_outlined),
-          tf(fee, "Tarif (FCFA)", type: TextInputType.number, icon: Icons.payments_outlined),
-          tf(exp, "Années d'expérience", type: TextInputType.number, icon: Icons.workspace_premium_outlined),
+          tf(fee, "Tarif (FCFA)",
+              type: TextInputType.number, icon: Icons.payments_outlined),
+          tf(exp, "Années d'expérience",
+              type: TextInputType.number,
+              icon: Icons.workspace_premium_outlined),
           tf(lang, "Langues parlées", icon: Icons.translate_rounded),
           tf(bio, "Présentation", lines: 3, icon: Icons.notes_rounded),
           PrimaryButton(
@@ -444,7 +540,6 @@ class _DoctorProfileState extends State<_DoctorProfile> {
   }
 }
 
-
 class _Blocks extends StatelessWidget {
   const _Blocks();
 
@@ -459,7 +554,8 @@ class _Blocks extends StatelessWidget {
     if (r == null || !c.mounted) return;
     final f = DateFormat('yyyy-MM-dd');
     await guard(c, () async {
-      await Api.post('/doctor/blocks', {'from': f.format(r.start), 'to': f.format(r.end), 'reason': ''});
+      await Api.post('/doctor/blocks',
+          {'from': f.format(r.start), 'to': f.format(r.end), 'reason': ''});
       reload();
     });
   }
@@ -467,13 +563,19 @@ class _Blocks extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Load<List<dynamic>>(
         load: () async => (await Api.get('/doctor/blocks')) as List,
-        builder: (c, list, reload) => ListView(padding: const EdgeInsets.all(16), children: [
-          sectionTitle("Congés et indisponibilités", icon: Icons.beach_access_outlined),
-          Text(tr("Les jours bloqués n'offrent plus de créneaux aux patients. Les rendez-vous déjà pris restent à annuler manuellement.")),
+        builder: (c, list, reload) =>
+            ListView(padding: const EdgeInsets.all(16), children: [
+          sectionTitle("Congés et indisponibilités",
+              icon: Icons.beach_access_outlined),
+          Text(tr(
+              "Les jours bloqués n'offrent plus de créneaux aux patients. Les rendez-vous déjà pris restent à annuler manuellement.")),
           const SizedBox(height: 12),
-          PrimaryButton("Bloquer des jours", icon: Icons.event_busy_rounded, onPressed: () => _add(c, reload)),
+          PrimaryButton("Bloquer des jours",
+              icon: Icons.event_busy_rounded, onPressed: () => _add(c, reload)),
           const SizedBox(height: 12),
-          if (list.isEmpty) const Empty("Aucun jour bloqué.", icon: Icons.event_available_rounded),
+          if (list.isEmpty)
+            const Empty("Aucun jour bloqué.",
+                icon: Icons.event_available_rounded),
           for (var i = 0; i < list.length; i++)
             AppCard(
               index: i,
@@ -482,9 +584,11 @@ class _Blocks extends StatelessWidget {
                   child: Text(
                     tr("Du {a} au {b}", {
                       'a': _ds(DateTime.parse('${list[i]['starts_at']}')),
-                      'b': _ds(DateTime.parse('${list[i]['ends_at']}').subtract(const Duration(days: 1))),
+                      'b': _ds(DateTime.parse('${list[i]['ends_at']}')
+                          .subtract(const Duration(days: 1))),
                     }),
-                    style: const TextStyle(fontWeight: FontWeight.w700, color: cDark),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, color: cDark),
                   ),
                 ),
                 IconButton(

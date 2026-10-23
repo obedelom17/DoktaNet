@@ -36,7 +36,8 @@ ThemeData buildTheme() {
   final radius14 = BorderRadius.circular(14);
   return ThemeData(
     useMaterial3: true,
-    colorScheme: ColorScheme.fromSeed(seedColor: cMid, primary: cMid, secondary: cAccent),
+    colorScheme: ColorScheme.fromSeed(
+        seedColor: cMid, primary: cMid, secondary: cAccent),
     scaffoldBackgroundColor: cBg,
     appBarTheme: const AppBarTheme(
       backgroundColor: cDark,
@@ -57,12 +58,12 @@ ThemeData buildTheme() {
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: Colors.white,
-      indicatorColor: cMid.withOpacity(0.16),
+      indicatorColor: cMid.withValues(alpha: 0.16),
       height: 68,
     ),
     chipTheme: ChipThemeData(
       backgroundColor: Colors.white,
-      side: BorderSide(color: cMid.withOpacity(0.35)),
+      side: BorderSide(color: cMid.withValues(alpha: 0.35)),
       shape: const StadiumBorder(),
       labelStyle: const TextStyle(color: cDark, fontWeight: FontWeight.w600),
     ),
@@ -83,7 +84,7 @@ ThemeData buildTheme() {
         minimumSize: const Size(64, 50),
         padding: const EdgeInsets.symmetric(horizontal: 18),
         textStyle: const TextStyle(fontSize: 15.5, fontWeight: FontWeight.w700),
-        side: BorderSide(color: cMid.withOpacity(0.55), width: 1.4),
+        side: BorderSide(color: cMid.withValues(alpha: 0.55), width: 1.4),
         shape: RoundedRectangleBorder(borderRadius: radius14),
       ),
     ),
@@ -98,9 +99,15 @@ ThemeData buildTheme() {
       filled: true,
       fillColor: Colors.white,
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      border: OutlineInputBorder(borderRadius: radius14, borderSide: BorderSide(color: cDark.withOpacity(0.12))),
-      enabledBorder: OutlineInputBorder(borderRadius: radius14, borderSide: BorderSide(color: cDark.withOpacity(0.12))),
-      focusedBorder: OutlineInputBorder(borderRadius: radius14, borderSide: const BorderSide(color: cMid, width: 2)),
+      border: OutlineInputBorder(
+          borderRadius: radius14,
+          borderSide: BorderSide(color: cDark.withValues(alpha: 0.12))),
+      enabledBorder: OutlineInputBorder(
+          borderRadius: radius14,
+          borderSide: BorderSide(color: cDark.withValues(alpha: 0.12))),
+      focusedBorder: OutlineInputBorder(
+          borderRadius: radius14,
+          borderSide: const BorderSide(color: cMid, width: 2)),
     ),
   );
 }
