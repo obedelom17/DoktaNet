@@ -4,6 +4,7 @@ import '../common.dart';
 import '../i18n.dart';
 import '../session.dart';
 import '../theme.dart';
+import '../photos.dart';
 import 'chat.dart';
 
 class PharmacyHome extends StatelessWidget {
@@ -103,17 +104,35 @@ class _Orders extends StatelessWidget {
         ]),
       );
 
+  Widget _stat(String label, int v) => Column(children: [
+        Text('$v', style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+        Text(label, style: TextStyle(color: Colors.white.withOpacity(0.88), fontSize: 13)),
+      ]);
+
   @override
   Widget build(BuildContext context) => Load<List<dynamic>>(
         load: () async => (await Api.get('/orders')) as List,
         builder: (c, orders, reload) => RefreshIndicator(
           onRefresh: () async => reload(),
-          child: ListView(padding: const EdgeInsets.all(16), children: [
-            HeroBanner(
-              title: tr("Pharmacie connectée"),
+          child: HeroList(
+            hero: PhotoHero(
+              photo: Photos.pharmacy,
+              kicker: tr("Bonjour,"),
+              title: '${session.user?['full_name'] ?? ''}',
               subtitle: tr("{n} commande(s) dans votre file.", {'n': orders.length}),
-              trailing: const Padding(padding: EdgeInsets.only(left: 12), child: PulseDot()),
+              actions: [
+                HeroPill(icon: Icons.inventory_2_rounded, label: tr("Stock"), filled: true, onTap: () => ShellScope.of(c)?.go(1)),
+                HeroPill(icon: Icons.chat_bubble_rounded, label: tr("Assistant"), onTap: () => ShellScope.of(c)?.go(2)),
+              ],
+              panel: GlassPanel(
+                child: Row(children: [
+                  Expanded(child: _stat(tr("À traiter"), orders.where((o) => o['status'] == 'sent' || o['status'] == 'preparing').length)),
+                  Container(width: 1, height: 36, color: Colors.white.withOpacity(0.3)),
+                  Expanded(child: _stat(tr("Prêtes"), orders.where((o) => o['status'] == 'ready').length)),
+                ]),
+              ),
             ),
+            children: [
             sectionTitle("File des ordonnances", icon: Icons.receipt_long_rounded),
             if (orders.isEmpty) const Empty("Aucune commande reçue.", icon: Icons.inbox_outlined),
             for (var i = 0; i < orders.length; i++) _card(c, orders[i], i, reload),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../api.dart';
 import '../common.dart';
 import '../i18n.dart';
+import '../install.dart';
 import '../session.dart';
 import '../theme.dart';
 
@@ -101,6 +102,14 @@ class _AccountPageState extends State<AccountPage> {
                     style: const TextStyle(fontWeight: FontWeight.w700, color: cDark),
                   ),
                 ),
+              sectionTitle("Application", icon: Icons.install_mobile_rounded),
+              AppCard(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(tr("Ajoutez DoktaNet à votre écran d'accueil pour y accéder en un geste, en plein écran.")),
+                  const SizedBox(height: 12),
+                  PrimaryButton("Installer l'application", icon: Icons.download_rounded, onPressed: openInstallPrompt),
+                ]),
+              ),
               sectionTitle("Authentification à deux facteurs", icon: Icons.shield_outlined),
               AppCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -6,8 +6,25 @@
   "background_color": "#0A3B50",
   "theme_color": "#0A3B50",
   "icons": [
-    {"src": "icons/Icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
-    {"src": "icons/Icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
-  "description": "Téléconsultation et parcours de soins connectés au Togo. / Telehealth and connected care in Togo."
+  "description": "Téléconsultation et parcours de soins connectés au Togo. / Telehealth and connected care in Togo.",
+  "id": "/",
+  "scope": "/",
+  "lang": "fr",
+  "categories": [
+    "health",
+    "medical"
+  ]
 }

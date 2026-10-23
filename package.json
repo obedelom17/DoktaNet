@@ -8,7 +8,7 @@
     "@neondatabase/serverless": "^1.0.0"
   },
   "devDependencies": {
-    "wrangler": "^4.151.1"
+    "wrangler": "^3.90.0"
   },
   "scripts": {
     "build": "flutter build web --release",

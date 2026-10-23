@@ -9,10 +9,8 @@ import 'i18n.dart';
 import 'session.dart';
 import 'theme.dart';
 
-String fmtDt(dynamic iso) =>
-    DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse('$iso').toLocal());
-String fmtHm(dynamic iso) =>
-    DateFormat('HH:mm').format(DateTime.parse('$iso').toLocal());
+String fmtDt(dynamic iso) => DateFormat('dd/MM/yyyy HH:mm').format(DateTime.parse('$iso').toLocal());
+String fmtHm(dynamic iso) => DateFormat('HH:mm').format(DateTime.parse('$iso').toLocal());
 
 /// Affiche un message déjà traduit (utiliser tr(...) à l'appel).
 void toast(BuildContext c, String m) {
@@ -32,8 +30,7 @@ Future<void> guard(BuildContext c, Future<void> Function() f) async {
 }
 
 String itemsText(dynamic items) => (items as List)
-    .map((e) =>
-        '${e['name']} - ${e['dosage'] ?? ''} ${e['duration'] ?? ''}'.trim())
+    .map((e) => '${e['name']} - ${e['dosage'] ?? ''} ${e['duration'] ?? ''}'.trim())
     .join('\n');
 
 const statusFr = {
@@ -80,18 +77,13 @@ Widget chip(String s) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
     decoration: BoxDecoration(
-      color: col.withValues(alpha: 0.12),
+      color: col.withOpacity(0.12),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Row(mainAxisSize: MainAxisSize.min, children: [
-      Container(
-          width: 7,
-          height: 7,
-          decoration: BoxDecoration(color: col, shape: BoxShape.circle)),
+      Container(width: 7, height: 7, decoration: BoxDecoration(color: col, shape: BoxShape.circle)),
       const SizedBox(width: 6),
-      Text(tr(statusFr[s] ?? s),
-          style: TextStyle(
-              color: col, fontWeight: FontWeight.w700, fontSize: 12.5)),
+      Text(tr(statusFr[s] ?? s), style: TextStyle(color: col, fontWeight: FontWeight.w700, fontSize: 12.5)),
     ]),
   );
 }
@@ -102,18 +94,12 @@ Widget sectionTitle(String t, {IconData? icon}) => Padding(
         Container(
           width: 5,
           height: 22,
-          decoration: BoxDecoration(
-              gradient: kGoldGradient, borderRadius: BorderRadius.circular(4)),
+          decoration: BoxDecoration(gradient: kGoldGradient, borderRadius: BorderRadius.circular(4)),
         ),
         const SizedBox(width: 10),
-        if (icon != null) ...[
-          Icon(icon, color: cMid, size: 22),
-          const SizedBox(width: 8)
-        ],
+        if (icon != null) ...[Icon(icon, color: cMid, size: 22), const SizedBox(width: 8)],
         Expanded(
-          child: Text(tr(t),
-              style: const TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.w800, color: cDark)),
+          child: Text(tr(t), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: cDark)),
         ),
       ]),
     );
@@ -128,26 +114,21 @@ class Empty extends StatelessWidget {
           margin: const EdgeInsets.only(bottom: 8),
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.7),
+            color: Colors.white.withOpacity(0.7),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: cMid.withValues(alpha: 0.18)),
+            border: Border.all(color: cMid.withOpacity(0.18)),
           ),
           child: Row(children: [
-            Icon(icon, color: cMid.withValues(alpha: 0.7), size: 30),
+            Icon(icon, color: cMid.withOpacity(0.7), size: 30),
             const SizedBox(width: 14),
-            Expanded(
-                child: Text(tr(text),
-                    style: const TextStyle(color: cMuted, fontSize: 15))),
+            Expanded(child: Text(tr(text), style: const TextStyle(color: cMuted, fontSize: 15))),
           ]),
         ),
       );
 }
 
 Widget tf(TextEditingController c, String label,
-        {TextInputType? type,
-        int lines = 1,
-        bool obscure = false,
-        IconData? icon}) =>
+        {TextInputType? type, int lines = 1, bool obscure = false, IconData? icon}) =>
     Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextField(
@@ -173,9 +154,7 @@ class InfoRow extends StatelessWidget {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Icon(icon, size: 17, color: cMid),
           const SizedBox(width: 8),
-          Expanded(
-              child: Text(text,
-                  style: const TextStyle(color: cMuted, fontSize: 14.5))),
+          Expanded(child: Text(text, style: const TextStyle(color: cMuted, fontSize: 14.5))),
         ]),
       );
 }
@@ -184,8 +163,7 @@ class IconBadge extends StatelessWidget {
   final IconData icon;
   final Gradient gradient;
   final double size;
-  const IconBadge(this.icon,
-      {super.key, this.gradient = kBrandGradient, this.size = 46});
+  const IconBadge(this.icon, {super.key, this.gradient = kBrandGradient, this.size = 46});
   @override
   Widget build(BuildContext context) => Container(
         width: size,
@@ -193,12 +171,7 @@ class IconBadge extends StatelessWidget {
         decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: BorderRadius.circular(size * 0.32),
-          boxShadow: [
-            BoxShadow(
-                color: cMid.withValues(alpha: 0.25),
-                blurRadius: 12,
-                offset: const Offset(0, 6))
-          ],
+          boxShadow: [BoxShadow(color: cMid.withOpacity(0.25), blurRadius: 12, offset: const Offset(0, 6))],
         ),
         child: Icon(icon, color: Colors.white, size: size * 0.5),
       );
@@ -210,12 +183,10 @@ class InitialsAvatar extends StatelessWidget {
   const InitialsAvatar(this.name, {super.key, this.size = 48});
   @override
   Widget build(BuildContext context) {
-    final parts =
-        name.trim().split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
+    final parts = name.trim().split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
     final ini = parts.isEmpty
         ? '?'
-        : (parts.length == 1 ? parts[0][0] : '${parts[0][0]}${parts[1][0]}')
-            .toUpperCase();
+        : (parts.length == 1 ? parts[0][0] : '${parts[0][0]}${parts[1][0]}').toUpperCase();
     return Container(
       width: size,
       height: size,
@@ -224,18 +195,9 @@ class InitialsAvatar extends StatelessWidget {
         gradient: kBrandGradient,
         shape: BoxShape.circle,
         border: Border.all(color: Colors.white, width: 2),
-        boxShadow: [
-          BoxShadow(
-              color: cMid.withValues(alpha: 0.3),
-              blurRadius: 10,
-              offset: const Offset(0, 4))
-        ],
+        boxShadow: [BoxShadow(color: cMid.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
       ),
-      child: Text(ini,
-          style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: size * 0.36)),
+      child: Text(ini, style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: size * 0.36)),
     );
   }
 }
@@ -250,28 +212,20 @@ class Reveal extends StatefulWidget {
   final int index;
   final Duration delay;
   final double dy;
-  const Reveal(
-      {super.key,
-      required this.child,
-      this.index = 0,
-      this.delay = Duration.zero,
-      this.dy = 24});
+  const Reveal({super.key, required this.child, this.index = 0, this.delay = Duration.zero, this.dy = 24});
   @override
   State<Reveal> createState() => _RevealState();
 }
 
 class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 650));
-  late final Animation<double> _a =
-      CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 650));
+  late final Animation<double> _a = CurvedAnimation(parent: _c, curve: Curves.easeOutCubic);
   Timer? _t;
 
   @override
   void initState() {
     super.initState();
-    final d =
-        widget.delay + Duration(milliseconds: math.min(widget.index, 10) * 70);
+    final d = widget.delay + Duration(milliseconds: math.min(widget.index, 10) * 70);
     if (d == Duration.zero) {
       _c.forward();
     } else {
@@ -294,8 +248,7 @@ class _RevealState extends State<Reveal> with SingleTickerProviderStateMixin {
         child: widget.child,
         builder: (context, child) => Opacity(
           opacity: _a.value.clamp(0.0, 1.0),
-          child: Transform.translate(
-              offset: Offset(0, (1 - _a.value) * widget.dy), child: child),
+          child: Transform.translate(offset: Offset(0, (1 - _a.value) * widget.dy), child: child),
         ),
       );
 }
@@ -330,8 +283,7 @@ class _AppCardState extends State<AppCard> {
       child: MouseRegion(
         onEnter: (_) => setState(() => hover = true),
         onExit: (_) => setState(() => hover = false),
-        cursor:
-            widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
+        cursor: widget.onTap != null ? SystemMouseCursors.click : MouseCursor.defer,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 220),
           curve: Curves.easeOut,
@@ -341,13 +293,10 @@ class _AppCardState extends State<AppCard> {
             gradient: widget.gradient,
             color: widget.gradient == null ? Colors.white : null,
             borderRadius: r,
-            border: Border.all(
-                color: hover
-                    ? cMid.withValues(alpha: 0.4)
-                    : cDark.withValues(alpha: 0.08)),
+            border: Border.all(color: hover ? cMid.withOpacity(0.4) : cDark.withOpacity(0.08)),
             boxShadow: [
               BoxShadow(
-                color: cDark.withValues(alpha: hover ? 0.16 : 0.07),
+                color: cDark.withOpacity(hover ? 0.16 : 0.07),
                 blurRadius: hover ? 28 : 16,
                 offset: Offset(0, hover ? 12 : 6),
               ),
@@ -377,12 +326,7 @@ class PrimaryButton extends StatefulWidget {
   final bool gold;
   final bool expand;
   const PrimaryButton(this.label,
-      {super.key,
-      this.onPressed,
-      this.icon,
-      this.busy = false,
-      this.gold = false,
-      this.expand = true});
+      {super.key, this.onPressed, this.icon, this.busy = false, this.gold = false, this.expand = true});
   @override
   State<PrimaryButton> createState() => _PrimaryButtonState();
 }
@@ -412,16 +356,13 @@ class _PrimaryButtonState extends State<PrimaryButton> {
             width: widget.expand ? double.infinity : null,
             padding: const EdgeInsets.symmetric(horizontal: 24),
             decoration: BoxDecoration(
-              gradient: enabled || widget.busy
-                  ? (widget.gold ? kGoldGradient : kBrandGradient)
-                  : null,
+              gradient: enabled || widget.busy ? (widget.gold ? kGoldGradient : kBrandGradient) : null,
               color: enabled || widget.busy ? null : Colors.black12,
               borderRadius: BorderRadius.circular(16),
               boxShadow: enabled
                   ? [
                       BoxShadow(
-                        color: (widget.gold ? cAccent : cMid)
-                            .withValues(alpha: hover ? 0.5 : 0.3),
+                        color: (widget.gold ? cAccent : cMid).withOpacity(hover ? 0.5 : 0.3),
                         blurRadius: hover ? 26 : 16,
                         offset: const Offset(0, 8),
                       ),
@@ -434,16 +375,12 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                   SizedBox(
                     width: 20,
                     height: 20,
-                    child:
-                        CircularProgressIndicator(strokeWidth: 2.5, color: fg),
+                    child: CircularProgressIndicator(strokeWidth: 2.5, color: fg),
                   )
                 else if (widget.icon != null)
                   Icon(widget.icon, color: fg, size: 20),
-                if (widget.busy || widget.icon != null)
-                  const SizedBox(width: 10),
-                Text(tr(widget.label),
-                    style: TextStyle(
-                        color: fg, fontWeight: FontWeight.w800, fontSize: 16)),
+                if (widget.busy || widget.icon != null) const SizedBox(width: 10),
+                Text(tr(widget.label), style: TextStyle(color: fg, fontWeight: FontWeight.w800, fontSize: 16)),
               ]),
             ),
           ),
@@ -463,9 +400,7 @@ class CountUp extends StatelessWidget {
         tween: Tween<double>(begin: 0, end: value.toDouble()),
         duration: const Duration(milliseconds: 1300),
         curve: Curves.easeOutCubic,
-        builder: (context, v, _) => Text(
-            NumberFormat.decimalPattern('fr').format(v.round()),
-            style: style),
+        builder: (context, v, _) => Text(NumberFormat.decimalPattern('fr').format(v.round()), style: style),
       );
 }
 
@@ -478,10 +413,8 @@ class PulseDot extends StatefulWidget {
   State<PulseDot> createState() => _PulseDotState();
 }
 
-class _PulseDotState extends State<PulseDot>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 1400))
+class _PulseDotState extends State<PulseDot> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1400))
     ..repeat();
   @override
   void dispose() {
@@ -495,20 +428,13 @@ class _PulseDotState extends State<PulseDot>
         height: widget.size * 2.4,
         child: AnimatedBuilder(
           animation: _c,
-          builder: (context, _) =>
-              Stack(alignment: Alignment.center, children: [
+          builder: (context, _) => Stack(alignment: Alignment.center, children: [
             Container(
               width: widget.size * (1 + 1.4 * _c.value),
               height: widget.size * (1 + 1.4 * _c.value),
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: widget.color.withValues(alpha: 0.45 * (1 - _c.value))),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: widget.color.withOpacity(0.45 * (1 - _c.value))),
             ),
-            Container(
-                width: widget.size,
-                height: widget.size,
-                decoration:
-                    BoxDecoration(shape: BoxShape.circle, color: widget.color)),
+            Container(width: widget.size, height: widget.size, decoration: BoxDecoration(shape: BoxShape.circle, color: widget.color)),
           ]),
         ),
       );
@@ -521,10 +447,8 @@ class TypingDots extends StatefulWidget {
   State<TypingDots> createState() => _TypingDotsState();
 }
 
-class _TypingDotsState extends State<TypingDots>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 1000))
+class _TypingDotsState extends State<TypingDots> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1000))
     ..repeat();
   @override
   void dispose() {
@@ -541,14 +465,8 @@ class _TypingDotsState extends State<TypingDots>
               margin: const EdgeInsets.symmetric(horizontal: 3),
               width: 9,
               height: 9,
-              transform: Matrix4.translationValues(
-                  0,
-                  -6 *
-                      math.max(
-                          0.0, math.sin((_c.value * 2 * math.pi) - i * 0.9)),
-                  0),
-              decoration:
-                  const BoxDecoration(color: cMid, shape: BoxShape.circle),
+              transform: Matrix4.translationValues(0, -6 * math.max(0.0, math.sin((_c.value * 2 * math.pi) - i * 0.9)), 0),
+              decoration: const BoxDecoration(color: cMid, shape: BoxShape.circle),
             ),
         ]),
       );
@@ -594,8 +512,7 @@ class EcgPainter extends CustomPainter {
     canvas.drawPath(metric.extractPath(tail, head), stroke);
     final tangent = metric.getTangentForOffset(head);
     if (tangent != null) {
-      canvas.drawCircle(
-          tangent.position, 9, Paint()..color = color.withValues(alpha: 0.25));
+      canvas.drawCircle(tangent.position, 9, Paint()..color = color.withOpacity(0.25));
       canvas.drawCircle(tangent.position, 4.5, Paint()..color = color);
     }
   }
@@ -608,18 +525,14 @@ class _BlobPainter extends CustomPainter {
   final double t;
   _BlobPainter(this.t);
 
-  void _blob(Canvas canvas, Size s, double fx, double fy, double r, Color c,
-      double phase) {
+  void _blob(Canvas canvas, Size s, double fx, double fy, double r, Color c, double phase) {
     final cx = s.width * (fx + 0.08 * math.sin(t * 2 * math.pi + phase));
     final cy = s.height * (fy + 0.08 * math.cos(t * 2 * math.pi + phase));
     final rect = Rect.fromCircle(center: Offset(cx, cy), radius: r);
     canvas.drawCircle(
       Offset(cx, cy),
       r,
-      Paint()
-        ..shader = RadialGradient(
-                colors: [c.withValues(alpha: 0.55), c.withValues(alpha: 0)])
-            .createShader(rect),
+      Paint()..shader = RadialGradient(colors: [c.withOpacity(0.55), c.withOpacity(0)]).createShader(rect),
     );
   }
 
@@ -639,17 +552,14 @@ class _BlobPainter extends CustomPainter {
 class AnimatedBackdrop extends StatefulWidget {
   final Widget child;
   final Gradient gradient;
-  const AnimatedBackdrop(
-      {super.key, required this.child, this.gradient = kHeroGradient});
+  const AnimatedBackdrop({super.key, required this.child, this.gradient = kHeroGradient});
   @override
   State<AnimatedBackdrop> createState() => _AnimatedBackdropState();
 }
 
-class _AnimatedBackdropState extends State<AnimatedBackdrop>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c =
-      AnimationController(vsync: this, duration: const Duration(seconds: 14))
-        ..repeat();
+class _AnimatedBackdropState extends State<AnimatedBackdrop> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(seconds: 14))
+    ..repeat();
   @override
   void dispose() {
     _c.dispose();
@@ -663,8 +573,7 @@ class _AnimatedBackdropState extends State<AnimatedBackdrop>
           Positioned.fill(
             child: AnimatedBuilder(
               animation: _c,
-              builder: (context, _) =>
-                  CustomPaint(painter: _BlobPainter(_c.value)),
+              builder: (context, _) => CustomPaint(painter: _BlobPainter(_c.value)),
             ),
           ),
           widget.child,
@@ -677,16 +586,13 @@ class HeroBanner extends StatefulWidget {
   final String title;
   final String subtitle;
   final Widget? trailing;
-  const HeroBanner(
-      {super.key, required this.title, required this.subtitle, this.trailing});
+  const HeroBanner({super.key, required this.title, required this.subtitle, this.trailing});
   @override
   State<HeroBanner> createState() => _HeroBannerState();
 }
 
-class _HeroBannerState extends State<HeroBanner>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 3600))
+class _HeroBannerState extends State<HeroBanner> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 3600))
     ..repeat();
   @override
   void dispose() {
@@ -702,19 +608,13 @@ class _HeroBannerState extends State<HeroBanner>
           decoration: BoxDecoration(
             gradient: kHeroGradient,
             borderRadius: BorderRadius.circular(26),
-            boxShadow: [
-              BoxShadow(
-                  color: cDark.withValues(alpha: 0.3),
-                  blurRadius: 30,
-                  offset: const Offset(0, 14))
-            ],
+            boxShadow: [BoxShadow(color: cDark.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 14))],
           ),
           child: Stack(children: [
             Positioned.fill(
               child: AnimatedBuilder(
                 animation: _c,
-                builder: (context, _) =>
-                    CustomPaint(painter: _BlobPainter(_c.value)),
+                builder: (context, _) => CustomPaint(painter: _BlobPainter(_c.value)),
               ),
             ),
             Positioned(
@@ -726,8 +626,7 @@ class _HeroBannerState extends State<HeroBanner>
                 opacity: 0.55,
                 child: AnimatedBuilder(
                   animation: _c,
-                  builder: (context, _) =>
-                      CustomPaint(painter: EcgPainter(_c.value, cMint)),
+                  builder: (context, _) => CustomPaint(painter: EcgPainter(_c.value, cMint)),
                 ),
               ),
             ),
@@ -735,20 +634,12 @@ class _HeroBannerState extends State<HeroBanner>
               padding: const EdgeInsets.fromLTRB(22, 22, 22, 56),
               child: Row(children: [
                 Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.title,
-                            style: const TextStyle(
-                                fontSize: 26,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white)),
-                        const SizedBox(height: 6),
-                        Text(widget.subtitle,
-                            style: TextStyle(
-                                fontSize: 15,
-                                color: Colors.white.withValues(alpha: 0.85))),
-                      ]),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(widget.title,
+                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white)),
+                    const SizedBox(height: 6),
+                    Text(widget.subtitle, style: TextStyle(fontSize: 15, color: Colors.white.withOpacity(0.85))),
+                  ]),
                 ),
                 if (widget.trailing != null) widget.trailing!,
               ]),
@@ -796,17 +687,14 @@ class LangToggle extends StatelessWidget {
                   height: 36,
                   padding: const EdgeInsets.all(3),
                   decoration: BoxDecoration(
-                    color: onDark
-                        ? Colors.white.withValues(alpha: 0.18)
-                        : cDark.withValues(alpha: 0.08),
+                    color: onDark ? Colors.white.withOpacity(0.18) : cDark.withOpacity(0.08),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Stack(children: [
                     AnimatedAlign(
                       duration: const Duration(milliseconds: 280),
                       curve: Curves.easeOutBack,
-                      alignment:
-                          en ? Alignment.centerRight : Alignment.centerLeft,
+                      alignment: en ? Alignment.centerRight : Alignment.centerLeft,
                       child: Container(
                         width: 43,
                         height: 30,
@@ -821,10 +709,7 @@ class LangToggle extends StatelessWidget {
                         child: Center(
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 200),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 13,
-                                color: en ? off : cDark),
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: en ? off : cDark),
                             child: const Text('FR'),
                           ),
                         ),
@@ -833,10 +718,7 @@ class LangToggle extends StatelessWidget {
                         child: Center(
                           child: AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 200),
-                            style: TextStyle(
-                                fontWeight: FontWeight.w800,
-                                fontSize: 13,
-                                color: en ? cDark : off),
+                            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: en ? cDark : off),
                             child: const Text('EN'),
                           ),
                         ),
@@ -861,10 +743,8 @@ class _SkeletonBox extends StatefulWidget {
   State<_SkeletonBox> createState() => _SkeletonBoxState();
 }
 
-class _SkeletonBoxState extends State<_SkeletonBox>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(
-      vsync: this, duration: const Duration(milliseconds: 1100))
+class _SkeletonBoxState extends State<_SkeletonBox> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))
     ..repeat(reverse: true);
   @override
   void dispose() {
@@ -875,9 +755,7 @@ class _SkeletonBoxState extends State<_SkeletonBox>
   Widget _bar(double w, double h) => Container(
         width: w,
         height: h,
-        decoration: BoxDecoration(
-            color: cMid.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(color: cMid.withOpacity(0.12), borderRadius: BorderRadius.circular(8)),
       );
 
   @override
@@ -888,26 +766,18 @@ class _SkeletonBoxState extends State<_SkeletonBox>
           child: Container(
             margin: const EdgeInsets.only(bottom: 14),
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-                color: Colors.white, borderRadius: BorderRadius.circular(20)),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
             child: Row(children: [
-              Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                      color: cMid.withValues(alpha: 0.12),
-                      shape: BoxShape.circle)),
+              Container(width: 46, height: 46, decoration: BoxDecoration(color: cMid.withOpacity(0.12), shape: BoxShape.circle)),
               const SizedBox(width: 14),
               Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _bar(160, 14),
-                      const SizedBox(height: 10),
-                      _bar(double.infinity, 11),
-                      const SizedBox(height: 6),
-                      _bar(110, 11),
-                    ]),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  _bar(160, 14),
+                  const SizedBox(height: 10),
+                  _bar(double.infinity, 11),
+                  const SizedBox(height: 6),
+                  _bar(110, 11),
+                ]),
               ),
             ]),
           ),
@@ -921,12 +791,7 @@ class SkeletonList extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
         padding: const EdgeInsets.all(16),
         physics: const NeverScrollableScrollPhysics(),
-        children: const [
-          _SkeletonBox(),
-          _SkeletonBox(),
-          _SkeletonBox(),
-          _SkeletonBox()
-        ],
+        children: const [_SkeletonBox(), _SkeletonBox(), _SkeletonBox(), _SkeletonBox()],
       );
 }
 
@@ -955,12 +820,9 @@ class _LoadState<T> extends State<Load<T>> {
                 padding: const EdgeInsets.all(24),
                 child: Reveal(
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
-                    Icon(Icons.cloud_off_rounded,
-                        size: 56, color: cMid.withValues(alpha: 0.6)),
+                    Icon(Icons.cloud_off_rounded, size: 56, color: cMid.withOpacity(0.6)),
                     const SizedBox(height: 12),
-                    Text(tr('${s.error}'),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: cMuted)),
+                    Text(tr('${s.error}'), textAlign: TextAlign.center, style: const TextStyle(color: cMuted)),
                     const SizedBox(height: 14),
                     OutlinedButton.icon(
                       onPressed: reload,
@@ -992,8 +854,7 @@ class TabDef {
 class ShellScope extends InheritedWidget {
   final void Function(int) go;
   const ShellScope({super.key, required this.go, required super.child});
-  static ShellScope? of(BuildContext c) =>
-      c.dependOnInheritedWidgetOfExactType<ShellScope>();
+  static ShellScope? of(BuildContext c) => c.dependOnInheritedWidgetOfExactType<ShellScope>();
   @override
   bool updateShouldNotify(ShellScope old) => false;
 }
@@ -1019,18 +880,14 @@ class _ShellState extends State<Shell> {
       transitionBuilder: (child, anim) => FadeTransition(
         opacity: anim,
         child: SlideTransition(
-          position:
-              Tween<Offset>(begin: const Offset(0, 0.03), end: Offset.zero)
-                  .animate(anim),
+          position: Tween<Offset>(begin: const Offset(0, 0.03), end: Offset.zero).animate(anim),
           child: child,
         ),
       ),
       child: KeyedSubtree(
         key: ValueKey(i),
         child: Center(
-          child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 940),
-              child: widget.tabs[i].page),
+          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 940), child: widget.tabs[i].page),
         ),
       ),
     );
@@ -1050,29 +907,19 @@ class _ShellState extends State<Shell> {
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 64,
-        flexibleSpace: Container(
-            decoration: const BoxDecoration(gradient: kHeaderGradient)),
+        flexibleSpace: Container(decoration: const BoxDecoration(gradient: kHeaderGradient)),
         titleSpacing: 16,
         title: Row(children: [
           const LogoMark(size: 38),
           const SizedBox(width: 12),
           Flexible(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text('DoktaNet',
-                      style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white)),
-                  Text(tr(widget.title),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white.withValues(alpha: 0.75))),
-                ]),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              const Text('DoktaNet', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white)),
+              Text(tr(widget.title),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 12, color: Colors.white.withOpacity(0.75))),
+            ]),
           ),
         ]),
         actions: [
@@ -1080,8 +927,7 @@ class _ShellState extends State<Shell> {
           const SizedBox(width: 4),
           IconButton(
             tooltip: tr("Mon compte"),
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (_) => const AccountPage())),
+            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AccountPage())),
             icon: const Icon(Icons.manage_accounts_outlined),
           ),
           IconButton(
@@ -1098,15 +944,13 @@ class _ShellState extends State<Shell> {
                 selectedIndex: i,
                 onDestinationSelected: go,
                 backgroundColor: Colors.white,
-                indicatorColor: cMid.withValues(alpha: 0.16),
+                indicatorColor: cMid.withOpacity(0.16),
                 selectedIconTheme: const IconThemeData(color: cMid),
-                selectedLabelTextStyle:
-                    const TextStyle(color: cMid, fontWeight: FontWeight.w700),
+                selectedLabelTextStyle: const TextStyle(color: cMid, fontWeight: FontWeight.w700),
                 labelType: NavigationRailLabelType.all,
                 destinations: [
                   for (final t in widget.tabs)
-                    NavigationRailDestination(
-                        icon: Icon(t.icon), label: Text(tr(t.label))),
+                    NavigationRailDestination(icon: Icon(t.icon), label: Text(tr(t.label))),
                 ],
               ),
               Expanded(child: body),
@@ -1118,8 +962,7 @@ class _ShellState extends State<Shell> {
               selectedIndex: i,
               onDestinationSelected: go,
               destinations: [
-                for (final t in widget.tabs)
-                  NavigationDestination(icon: Icon(t.icon), label: tr(t.label)),
+                for (final t in widget.tabs) NavigationDestination(icon: Icon(t.icon), label: tr(t.label)),
               ],
             ),
     );
@@ -1131,14 +974,10 @@ Future<void> openRoom(BuildContext c, String id) async {
     context: c,
     builder: (d) => AlertDialog(
       title: Text(tr("Rejoindre la consultation")),
-      content: Text(tr(
-          "Autorisez le micro et la caméra dans le navigateur. Connexion faible : choisissez Audio seul.")),
+      content: Text(tr("Autorisez le micro et la caméra dans le navigateur. Connexion faible : choisissez Audio seul.")),
       actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(d, true),
-            child: Text(tr("Audio seul"))),
-        ElevatedButton(
-            onPressed: () => Navigator.pop(d, false), child: Text(tr("Vidéo"))),
+        TextButton(onPressed: () => Navigator.pop(d, true), child: Text(tr("Audio seul"))),
+        ElevatedButton(onPressed: () => Navigator.pop(d, false), child: Text(tr("Vidéo"))),
       ],
     ),
   );
@@ -1153,18 +992,15 @@ Future<void> openRoom(BuildContext c, String id) async {
   });
 }
 
-Future<void> openPrint(String id) =>
-    launchUrl(Api.printUrl(id), webOnlyWindowName: '_blank');
+Future<void> openPrint(String id) => launchUrl(Api.printUrl(id), webOnlyWindowName: '_blank');
 
 /// Barre d'application dégradée pour les écrans secondaires.
 PreferredSizeWidget gradientAppBar(String title) => AppBar(
-      flexibleSpace:
-          Container(decoration: const BoxDecoration(gradient: kHeaderGradient)),
+      flexibleSpace: Container(decoration: const BoxDecoration(gradient: kHeaderGradient)),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
       actions: const [LangToggle(), SizedBox(width: 12)],
     );
 
 /// Centre et limite la largeur du contenu sur grand écran.
-Widget pageWrap(Widget child, {double maxWidth = 900}) => Center(
-    child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth), child: child));
+Widget pageWrap(Widget child, {double maxWidth = 900}) =>
+    Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth), child: child));

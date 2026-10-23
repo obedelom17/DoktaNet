@@ -28,6 +28,35 @@
     #splash .bar i { display: block; width: 40%; height: 100%; background: #ff6f59; border-radius: 4px; animation: slide 1.2s ease-in-out infinite; }
     @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
     @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }
+
+    /* Fenêtre « Installer l'application » */
+    #dk-install {
+      position: fixed; z-index: 20; left: 12px; right: 12px; margin: 0 auto; max-width: 440px;
+      bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+      background: #fff; color: #0f2230; border-radius: 22px; padding: 16px 16px 14px;
+      box-shadow: 0 18px 50px rgba(6,43,60,.38); border: 1px solid rgba(14,89,118,.12);
+      font-family: Roboto, "Segoe UI", Arial, sans-serif;
+      transform: translateY(150%); opacity: 0; visibility: hidden;
+      transition: transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s ease, visibility 0s linear .45s;
+    }
+    #dk-install.show { transform: none; opacity: 1; visibility: visible; transition-delay: 0s; }
+    #dk-install .dk-row { display: flex; gap: 14px; align-items: flex-start; }
+    #dk-install img { width: 54px; height: 54px; border-radius: 13px; flex: none; box-shadow: 0 2px 10px rgba(14,89,118,.25); }
+    #dk-install strong { display: block; font-size: 17px; color: #0a3b50; margin-bottom: 3px; }
+    #dk-install p { margin: 0; font-size: 14.5px; line-height: 1.4; color: #3d5160; }
+    #dk-install p svg { vertical-align: -4px; margin: 0 2px; }
+    #dk-install .dk-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+    #dk-install button {
+      font: inherit; font-size: 15px; font-weight: 700; border-radius: 999px; padding: 11px 22px;
+      cursor: pointer; border: 0; min-height: 44px;
+    }
+    #dk-install .go { background: #0e5976; color: #fff; }
+    #dk-install .later { background: transparent; color: #0e5976; }
+    #dk-install button:focus-visible { outline: 3px solid #ff6f59; outline-offset: 2px; }
+    @media (min-width: 720px) {
+      #dk-install { left: auto; right: 24px; bottom: 24px; width: 400px; margin: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) { #dk-install { transition: none; } }
   </style>
 </head>
 <body>
@@ -39,6 +68,110 @@
       s.classList.add('hide');
       setTimeout(function () { s.remove(); }, 600);
     });
+  </script>
+  <div id="dk-install" role="dialog" aria-labelledby="dk-i-title" aria-describedby="dk-i-text" hidden>
+    <div class="dk-row">
+      <img src="icons/Icon-192.png" alt="">
+      <div><strong id="dk-i-title"></strong><p id="dk-i-text"></p></div>
+    </div>
+    <div class="dk-actions"><button type="button" class="later" id="dk-i-later"></button><button type="button" class="go" id="dk-i-go"></button></div>
+  </div>
+  <script>
+    (function () {
+      var KEY = "dk_install_hidden_until";
+      var el = document.getElementById("dk-install");
+      var titleEl = document.getElementById("dk-i-title");
+      var textEl = document.getElementById("dk-i-text");
+      var goBtn = document.getElementById("dk-i-go");
+      var laterBtn = document.getElementById("dk-i-later");
+      var deferred = null, shown = false, ready = false, mode = "";
+      var ua = navigator.userAgent || "";
+      var isIOS = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      var shareIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0e5976" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 11v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-8"/></svg>';
+      var T = {
+        fr: {
+          title: "Installer DoktaNet",
+          prompt: "Ajoutez l\u2019application \u00e0 votre \u00e9cran d\u2019accueil pour un acc\u00e8s rapide, en plein \u00e9cran, comme une application.",
+          ios: "Touchez " + shareIcon + " Partager, puis \u00ab Sur l\u2019\u00e9cran d\u2019accueil \u00bb.",
+          manual: "Dans le menu de votre navigateur, choisissez \u00ab Installer l\u2019application \u00bb ou \u00ab Ajouter \u00e0 l\u2019\u00e9cran d\u2019accueil \u00bb.",
+          done: "L\u2019application est d\u00e9j\u00e0 install\u00e9e sur cet appareil.",
+          install: "Installer", later: "Plus tard", ok: "Compris"
+        },
+        en: {
+          title: "Install DoktaNet",
+          prompt: "Add the app to your home screen for quick, full-screen access, just like an app.",
+          ios: "Tap " + shareIcon + " Share, then \u201cAdd to Home Screen\u201d.",
+          manual: "In your browser menu, choose \u201cInstall app\u201d or \u201cAdd to Home screen\u201d.",
+          done: "The app is already installed on this device.",
+          install: "Install", later: "Later", ok: "Got it"
+        }
+      };
+      function lang() {
+        try {
+          var v = (localStorage.getItem("flutter.lang") || "").replace(/"/g, "");
+          if (v) return v === "en" ? "en" : "fr";
+        } catch (e) {}
+        return "fr";
+      }
+      function standalone() {
+        return (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) || window.navigator.standalone === true;
+      }
+      function hiddenNow() {
+        try { return Date.now() < Number(localStorage.getItem(KEY) || 0); } catch (e) { return false; }
+      }
+      function hideFor(days) {
+        try { localStorage.setItem(KEY, String(Date.now() + days * 864e5)); } catch (e) {}
+      }
+      function hide() {
+        el.classList.remove("show");
+        shown = false;
+        setTimeout(function () { if (!shown) el.hidden = true; }, 500);
+      }
+      function show(m) {
+        var t = T[lang()];
+        mode = m;
+        titleEl.textContent = t.title;
+        textEl.innerHTML = t[m === "prompt" ? "prompt" : m];
+        goBtn.textContent = m === "prompt" ? t.install : t.ok;
+        laterBtn.textContent = t.later;
+        laterBtn.style.display = m === "prompt" ? "" : "none";
+        el.hidden = false;
+        shown = true;
+        requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("show"); }); });
+      }
+      function auto() {
+        if (!ready || shown || standalone() || hiddenNow()) return;
+        if (deferred) show("prompt");
+        else if (isIOS) show("ios");
+      }
+      goBtn.addEventListener("click", function () {
+        if (mode === "prompt" && deferred) {
+          var d = deferred;
+          deferred = null;
+          hide();
+          d.prompt();
+          if (d.userChoice) d.userChoice.then(function (r) { hideFor(r && r.outcome === "accepted" ? 3650 : 7); });
+        } else {
+          hideFor(mode === "ios" ? 30 : 0);
+          hide();
+        }
+      });
+      laterBtn.addEventListener("click", function () { hideFor(7); hide(); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && shown) { hideFor(7); hide(); } });
+      window.addEventListener("beforeinstallprompt", function (e) { e.preventDefault(); deferred = e; auto(); });
+      window.addEventListener("appinstalled", function () { deferred = null; hideFor(3650); if (shown) hide(); });
+      window.addEventListener("flutter-first-frame", function () { setTimeout(function () { ready = true; auto(); }, 3500); });
+      setTimeout(function () { ready = true; auto(); }, 9000);
+      // Appelé depuis l'application (Mon compte > Installer l'application)
+      window.doktaInstall = {
+        open: function () {
+          if (standalone()) show("done");
+          else if (deferred) show("prompt");
+          else if (isIOS) show("ios");
+          else show("manual");
+        }
+      };
+    })();
   </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>

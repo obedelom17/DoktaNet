@@ -47,3 +47,7 @@ Triage : niveau d'urgence, pistes (hypothèses), jamais de diagnostic ni de dose
 - Admin : recherche de comptes, mot de passe temporaire, litiges.
 - Mon compte : changement de mot de passe, signalement d'un problème.
 - Guides : dossier `docs/` (installation, patient, médecin, pharmacien, admin).
+
+## Photos et installation (PWA)
+- Photos : `assets/photos/` (4 images en 2 tailles, ~40 à 110 Ko chacune). Widgets dans `lib/photos.dart` : diaporama de la page de connexion, en-têtes d'accueil (patient, médecin, pharmacien), bandeaux des sections Médecins et Pharmacies. Pour changer une photo : remplacer les fichiers `nom_l.jpg` (grand écran, 1280 px) et `nom_s.jpg` (mobile, 720 px) et ajuster le cadrage dans `Photos`.
+- Installation : la fenêtre « Installer DoktaNet » est dans `web/index.html` (Chrome, Edge, Android : invite native ; iPhone/iPad : mode d'emploi Partager > Sur l'écran d'accueil). Elle s'affiche quelques secondes après le chargement, puis se rappelle au bout de 7 jours si elle est refusée. Le bouton « Installer l'application » de Mon compte la rouvre à tout moment.
