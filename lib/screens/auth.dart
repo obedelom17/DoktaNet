@@ -3,6 +3,7 @@ import '../api.dart';
 import '../common.dart';
 import '../i18n.dart';
 import '../session.dart';
+import '../install.dart';
 import '../photos.dart';
 import '../theme.dart';
 
@@ -306,7 +307,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ),
                       ),
-                      const Positioned(top: 18, right: 18, child: LangToggle(onDark: false)),
+                      const Positioned(top: 18, right: 18, child: Row(mainAxisSize: MainAxisSize.min, children: [InstallButton(onDark: false), LangToggle(onDark: false)])),
                     ]),
                   ),
                 ),
@@ -333,7 +334,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
               ),
-              const Positioned(top: 12, right: 12, child: SafeArea(child: LangToggle())),
+              const Positioned(top: 12, right: 12, child: SafeArea(child: Row(mainAxisSize: MainAxisSize.min, children: [InstallButton(), LangToggle()]))),
             ]),
           );
         },
@@ -424,7 +425,7 @@ class PendingScreen extends StatelessWidget {
             ),
           ),
         ),
-        const Positioned(top: 12, right: 12, child: SafeArea(child: LangToggle())),
+        const Positioned(top: 12, right: 12, child: SafeArea(child: Row(mainAxisSize: MainAxisSize.min, children: [InstallButton(), LangToggle()]))),
       ]),
     );
   }

@@ -127,14 +127,19 @@
         shown = false;
         setTimeout(function () { if (!shown) el.hidden = true; }, 500);
       }
-      function show(m) {
-        var t = T[lang()];
+      var curLang = "";
+      function fill(m) {
+        curLang = lang();
+        var t = T[curLang];
         mode = m;
         titleEl.textContent = t.title;
         textEl.innerHTML = t[m === "prompt" ? "prompt" : m];
         goBtn.textContent = m === "prompt" ? t.install : t.ok;
         laterBtn.textContent = t.later;
         laterBtn.style.display = m === "prompt" ? "" : "none";
+      }
+      function show(m) {
+        fill(m);
         el.hidden = false;
         shown = true;
         requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add("show"); }); });
@@ -162,8 +167,11 @@
       window.addEventListener("appinstalled", function () { deferred = null; hideFor(3650); if (shown) hide(); });
       window.addEventListener("flutter-first-frame", function () { setTimeout(function () { ready = true; auto(); }, 3500); });
       setTimeout(function () { ready = true; auto(); }, 9000);
-      // Appelé depuis l'application (Mon compte > Installer l'application)
+      // La fenêtre suit la langue du site en direct (bouton FR | EN de l'application)
+      setInterval(function () { if (shown && lang() !== curLang) fill(mode); }, 400);
+      // Appelé depuis l'application (bouton « Installer l'application », Mon compte)
       window.doktaInstall = {
+        canInstall: function () { return !standalone() && (!!deferred || isIOS); },
         open: function () {
           if (standalone()) show("done");
           else if (deferred) show("prompt");

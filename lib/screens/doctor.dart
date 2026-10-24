@@ -14,10 +14,10 @@ class DoctorHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Shell(title: "Médecin", tabs: [
         TabDef("Agenda", Icons.event_note_outlined, _Agenda()),
-        TabDef("Disponibilités", Icons.schedule_rounded, _Availability()),
-        TabDef("Congés", Icons.beach_access_outlined, _Blocks()),
-        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
-        TabDef("Profil", Icons.person_outline, _DoctorProfile()),
+        TabDef("Disponibilités", Icons.schedule_rounded, _Availability(), narrow: true),
+        TabDef("Congés", Icons.beach_access_outlined, _Blocks(), narrow: true),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage(), narrow: true),
+        TabDef("Profil", Icons.person_outline, _DoctorProfile(), narrow: true),
       ]);
 }
 
@@ -158,7 +158,7 @@ class _Agenda extends StatelessWidget {
             children: [
             sectionTitle("Rendez-vous", icon: Icons.event_note_rounded),
             if (appts.isEmpty) const Empty("Aucun rendez-vous.", icon: Icons.event_busy_outlined),
-            for (var i = 0; i < appts.length; i++) _card(c, appts[i], i, reload),
+            ResponsiveGrid(children: [for (var i = 0; i < appts.length; i++) _card(c, appts[i], i, reload)]),
             const SizedBox(height: 20),
           ]),
         ),

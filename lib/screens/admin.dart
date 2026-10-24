@@ -13,7 +13,7 @@ class AdminHome extends StatelessWidget {
         TabDef("Comptes", Icons.manage_accounts_outlined, _Users()),
         TabDef("Litiges", Icons.flag_outlined, _Reports()),
         TabDef("Statistiques", Icons.bar_chart_rounded, _Stats()),
-        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage(), narrow: true),
       ]);
 }
 
@@ -73,7 +73,7 @@ class _Pending extends StatelessWidget {
           child: ListView(padding: const EdgeInsets.all(16), children: [
             sectionTitle("Comptes à valider", icon: Icons.verified_user_outlined),
             if (list.isEmpty) const Empty("Aucun compte en attente.", icon: Icons.task_alt_rounded),
-            for (var i = 0; i < list.length; i++) _card(c, list[i], i, reload),
+            ResponsiveGrid(children: [for (var i = 0; i < list.length; i++) _card(c, list[i], i, reload)]),
           ]),
         ),
       );
@@ -204,7 +204,7 @@ class _UsersState extends State<_Users> {
             load: () async => (await Api.get('/admin/users', {'q': qc.text.trim()})) as List,
             builder: (c, list, _) => ListView(padding: const EdgeInsets.symmetric(horizontal: 16), children: [
               if (list.isEmpty) const Empty("Aucun compte trouvé."),
-              for (var i = 0; i < list.length; i++)
+              ResponsiveGrid(children: [for (var i = 0; i < list.length; i++)
                 AppCard(
                   index: i,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -229,7 +229,7 @@ class _UsersState extends State<_Users> {
                         label: Text(tr("Réinitialiser le mot de passe")),
                       ),
                   ]),
-                ),
+                )]),
             ]),
           ),
         ),
@@ -267,7 +267,7 @@ class _Reports extends StatelessWidget {
           child: ListView(padding: const EdgeInsets.all(16), children: [
             sectionTitle("Litiges", icon: Icons.flag_outlined),
             if (list.isEmpty) const Empty("Aucun signalement.", icon: Icons.task_alt_rounded),
-            for (var i = 0; i < list.length; i++)
+            ResponsiveGrid(children: [for (var i = 0; i < list.length; i++)
               AppCard(
                 index: i,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -293,7 +293,7 @@ class _Reports extends StatelessWidget {
                       ),
                     ),
                 ]),
-              ),
+              )]),
           ]),
         ),
       );

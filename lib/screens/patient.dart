@@ -17,8 +17,8 @@ class PatientHome extends StatelessWidget {
         TabDef("Accueil", Icons.home_rounded, _Dashboard()),
         TabDef("Médecins", Icons.medical_services_outlined, _Doctors()),
         TabDef("Pharmacies", Icons.local_pharmacy_outlined, PharmacyList()),
-        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
-        TabDef("Profil", Icons.person_outline, _PatientProfile()),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage(), narrow: true),
+        TabDef("Profil", Icons.person_outline, _PatientProfile(), narrow: true),
       ]);
 }
 
@@ -97,16 +97,16 @@ class _Dashboard extends StatelessWidget {
               ]),
               sectionTitle("Rendez-vous", icon: Icons.event_note_rounded),
               if (appts.isEmpty) const Empty("Aucun rendez-vous. Onglet Médecins pour en prendre un.", icon: Icons.event_busy_outlined),
-              for (var i = 0; i < appts.length; i++) _ApptCard(appts[i], reload, i),
+              ResponsiveGrid(children: [for (var i = 0; i < appts.length; i++) _ApptCard(appts[i], reload, i)]),
               sectionTitle("Ordonnances", icon: Icons.description_rounded),
               if (rx.isEmpty) const Empty("Aucune ordonnance.", icon: Icons.description_outlined),
-              for (var i = 0; i < rx.length; i++) _RxCard(rx[i], reload, i),
+              ResponsiveGrid(children: [for (var i = 0; i < rx.length; i++) _RxCard(rx[i], reload, i)]),
               sectionTitle("Commandes en pharmacie", icon: Icons.local_pharmacy_rounded),
               if (orders.isEmpty) const Empty("Aucune commande.", icon: Icons.shopping_bag_outlined),
-              for (var i = 0; i < orders.length; i++) _OrderCard(orders[i], reload, i),
+              ResponsiveGrid(children: [for (var i = 0; i < orders.length; i++) _OrderCard(orders[i], reload, i)]),
               sectionTitle("Rappels de prise", icon: Icons.alarm_rounded),
               if (rem.isEmpty) const Empty("Aucun rappel. Demandez à l'assistant d'en créer un.", icon: Icons.alarm_off_outlined),
-              for (var i = 0; i < rem.length; i++)
+              ResponsiveGrid(children: [for (var i = 0; i < rem.length; i++)
                 AppCard(
                   index: i,
                   child: Row(children: [
@@ -132,7 +132,7 @@ class _Dashboard extends StatelessWidget {
                       }),
                     ),
                   ]),
-                ),
+                )]),
               const SizedBox(height: 20),
             ]),
           );
@@ -390,7 +390,7 @@ class _DoctorsState extends State<_Doctors> {
             builder: (c, docs, _) => docs.isEmpty
                 ? ListView(padding: const EdgeInsets.all(16), children: const [Empty("Aucun médecin trouvé.", icon: Icons.person_search_outlined)])
                 : ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 16), children: [
-                    for (var i = 0; i < docs.length; i++)
+                    ResponsiveGrid(children: [for (var i = 0; i < docs.length; i++)
                       AppCard(
                         index: i,
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -421,7 +421,7 @@ class _DoctorsState extends State<_Doctors> {
                             label: Text(tr("Prendre rendez-vous")),
                           ),
                         ]),
-                      ),
+                      )]),
                   ]),
           ),
         ),
@@ -687,7 +687,7 @@ class _PharmacyListState extends State<PharmacyList> {
             builder: (c, list, _) => list.isEmpty
                 ? ListView(padding: const EdgeInsets.all(16), children: const [Empty("Aucune pharmacie partenaire.", icon: Icons.storefront_outlined)])
                 : ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 16), children: [
-                    for (var i = 0; i < list.length; i++)
+                    ResponsiveGrid(children: [for (var i = 0; i < list.length; i++)
                       AppCard(
                         index: i,
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -727,7 +727,7 @@ class _PharmacyListState extends State<PharmacyList> {
                             ),
                           ]),
                         ]),
-                      ),
+                      )]),
                   ]),
           ),
         ),

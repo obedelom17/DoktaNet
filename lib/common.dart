@@ -1,3 +1,4 @@
+import 'install.dart';
 import 'screens/account.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -847,7 +848,9 @@ class TabDef {
   final String label;
   final IconData icon;
   final Widget page;
-  const TabDef(this.label, this.icon, this.page);
+  /// true : page de formulaire/discussion, centrée et limitée à 860 px ; false : pleine largeur.
+  final bool narrow;
+  const TabDef(this.label, this.icon, this.page, {this.narrow = false});
 }
 
 /// Permet à un écran enfant de changer d'onglet : ShellScope.of(context)?.go(1)
@@ -886,9 +889,9 @@ class _ShellState extends State<Shell> {
       ),
       child: KeyedSubtree(
         key: ValueKey(i),
-        child: Center(
-          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 940), child: widget.tabs[i].page),
-        ),
+        child: widget.tabs[i].narrow
+            ? Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 860), child: widget.tabs[i].page))
+            : widget.tabs[i].page,
       ),
     );
     final body = DecoratedBox(
@@ -923,6 +926,7 @@ class _ShellState extends State<Shell> {
           ),
         ]),
         actions: [
+          const InstallButton(),
           const LangToggle(),
           const SizedBox(width: 4),
           IconButton(
@@ -1004,3 +1008,26 @@ PreferredSizeWidget gradientAppBar(String title) => AppBar(
 /// Centre et limite la largeur du contenu sur grand écran.
 Widget pageWrap(Widget child, {double maxWidth = 900}) =>
     Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth), child: child));
+
+
+/// Grille adaptative : 1 colonne sur mobile, 2, 3 ou 4 colonnes selon la largeur disponible.
+class ResponsiveGrid extends StatelessWidget {
+  final List<Widget> children;
+  final double minTile;
+  final double gap;
+  const ResponsiveGrid({super.key, required this.children, this.minTile = 440, this.gap = 14});
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        final w = box.maxWidth;
+        var cols = ((w + gap) / (minTile + gap)).floor();
+        if (cols < 1) cols = 1;
+        if (cols > 4) cols = 4;
+        final tile = (w - gap * (cols - 1)) / cols;
+        return Wrap(
+          spacing: gap,
+          runSpacing: 0,
+          children: [for (final ch in children) SizedBox(width: tile, child: ch)],
+        );
+      });
+}

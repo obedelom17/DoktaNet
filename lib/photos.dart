@@ -10,19 +10,21 @@ class DkPhoto {
   final String name;
   final Alignment narrow;
   final Alignment wide;
-  const DkPhoto(this.name, this.narrow, this.wide);
-  String path(bool large) => 'assets/photos/${name}_${large ? 'l' : 's'}.jpg';
+  /// Hauteur (0 à 1) du centre des visages dans l'image : sert à cadrer les bandeaux très larges.
+  final double faceY;
+  const DkPhoto(this.name, this.narrow, this.wide, this.faceY);
+  String _p(String tier) => 'assets/photos/${name}_$tier.jpg';
+  /// s = mobile (720 px), l = 1280 px, xl = résolution d'origine (grands écrans).
+  String pathFor(double w, double h) => (w > 1300 || h > 1000) ? _p('xl') : ((w > 700 || h > 700) ? _p('l') : _p('s'));
 }
 
 class Photos {
-  static const team = DkPhoto('team', Alignment(0.0, -0.4), Alignment(0.0, -0.55));
-  static const pharmacy = DkPhoto('pharmacy', Alignment(0.7, -0.3), Alignment(0.3, -0.55));
-  static const consult = DkPhoto('consult', Alignment(0.2, -0.4), Alignment(0.1, -0.55));
-  static const doctor = DkPhoto('doctor', Alignment(0.5, -0.4), Alignment(0.0, -0.6));
+  static const team = DkPhoto('team', Alignment(0.0, -0.4), Alignment(0.0, -0.55), 0.27);
+  static const pharmacy = DkPhoto('pharmacy', Alignment(0.7, -0.3), Alignment(0.3, -0.55), 0.3);
+  static const consult = DkPhoto('consult', Alignment(0.2, -0.4), Alignment(0.1, -0.55), 0.3);
+  static const doctor = DkPhoto('doctor', Alignment(0.5, -0.4), Alignment(0.0, -0.6), 0.28);
   static const slides = [team, consult, pharmacy, doctor];
 }
-
-bool _useLarge(Size s) => s.width > 700 || s.height > 700;
 
 /// Image plein cadre (BoxFit.cover) avec fondu à l'affichage et choix automatique de la taille.
 class DkImage extends StatelessWidget {
@@ -35,9 +37,21 @@ class DkImage extends StatelessWidget {
         final w = box.maxWidth.isFinite ? box.maxWidth : screen.width;
         final h = box.maxHeight.isFinite ? box.maxHeight : screen.height;
         final ratio = w / h;
-        final a = ratio < 1.2 ? photo.narrow : (ratio > 3 ? Alignment(photo.wide.x, -0.95) : photo.wide);
+        const imgRatio = 16 / 9;
+        Alignment a;
+        if (ratio < 1.2) {
+          a = photo.narrow;
+        } else if (ratio > imgRatio) {
+          // Cadre plus large que l'image : on centre verticalement la fenêtre sur les visages.
+          final sh = w / imgRatio;
+          final slack = sh - h;
+          final y = slack <= 0 ? 0.0 : (((photo.faceY * sh) - h / 2) / slack * 2 - 1).clamp(-1.0, 1.0).toDouble();
+          a = Alignment(photo.wide.x, y);
+        } else {
+          a = photo.wide;
+        }
         return Image.asset(
-          photo.path(w > 700 || h > 700),
+          photo.pathFor(w, h),
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
@@ -70,6 +84,7 @@ class PhotoBackdrop extends StatefulWidget {
 class _PhotoBackdropState extends State<PhotoBackdrop> {
   Timer? _t;
   int _i = 0;
+  Size? _box;
 
   @override
   void initState() {
@@ -80,9 +95,9 @@ class _PhotoBackdropState extends State<PhotoBackdrop> {
       });
       Future.delayed(const Duration(seconds: 3), () {
         if (!mounted) return;
-        final large = _useLarge(MediaQuery.of(context).size);
+        final size = _box ?? MediaQuery.of(context).size;
         for (final p in widget.photos.skip(1)) {
-          precacheImage(AssetImage(p.path(large)), context);
+          precacheImage(AssetImage(p.pathFor(size.width, size.height)), context);
         }
       });
     }
@@ -95,7 +110,12 @@ class _PhotoBackdropState extends State<PhotoBackdrop> {
   }
 
   @override
-  Widget build(BuildContext context) => DecoratedBox(
+  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
+        _box = Size(box.maxWidth, box.maxHeight);
+        return _stack();
+      });
+
+  Widget _stack() => DecoratedBox(
         decoration: const BoxDecoration(gradient: kHeroGradient),
         child: Stack(children: [
           Positioned.fill(
@@ -252,11 +272,14 @@ class PhotoHero extends StatelessWidget {
                       ),
                     ),
                   ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: wide ? 290 : 0),
+                    constraints: BoxConstraints(minHeight: wide ? (box.maxWidth * 0.24).clamp(300.0, 400.0).toDouble() : 0),
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(wide ? 32 : 20, wide ? 26 : 16, wide ? 32 : 20, wide ? 26 : 24),
                       child: wide
-                          ? Row(children: [Expanded(flex: 6, child: content), const Spacer(flex: 4)])
+                          ? Align(
+                              alignment: Alignment.centerLeft,
+                              child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 560), child: content),
+                            )
                           : content,
                     ),
                   ),
@@ -284,7 +307,7 @@ class PhotoBanner extends StatelessWidget {
             child: ClipRRect(
               borderRadius: wide ? BorderRadius.circular(24) : const BorderRadius.vertical(bottom: Radius.circular(28)),
               child: SizedBox(
-                height: wide ? 150 : 138,
+                height: wide ? (box.maxWidth * 0.2).clamp(180.0, 300.0).toDouble() : 160,
                 child: Stack(children: [
                   Positioned.fill(child: DkImage(photo)),
                   Positioned.fill(
@@ -310,9 +333,9 @@ class PhotoBanner extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(22, 14, 22, 16),
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 460),
+                        constraints: const BoxConstraints(maxWidth: 560),
                         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: Colors.white)),
+                          Text(title, style: TextStyle(fontSize: wide ? 28 : 22, fontWeight: FontWeight.w800, color: Colors.white)),
                           const SizedBox(height: 3),
                           Text(subtitle, style: TextStyle(fontSize: 14, height: 1.25, color: Colors.white.withOpacity(0.88))),
                         ]),

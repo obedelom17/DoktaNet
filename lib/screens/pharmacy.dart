@@ -13,8 +13,8 @@ class PharmacyHome extends StatelessWidget {
   Widget build(BuildContext context) => const Shell(title: "Pharmacie", tabs: [
         TabDef("Commandes", Icons.receipt_long_outlined, _Orders()),
         TabDef("Stock", Icons.inventory_2_outlined, _Stock()),
-        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage()),
-        TabDef("Profil", Icons.storefront_outlined, _PharmacyProfile()),
+        TabDef("Assistant", Icons.chat_bubble_outline_rounded, ChatPage(), narrow: true),
+        TabDef("Profil", Icons.storefront_outlined, _PharmacyProfile(), narrow: true),
       ]);
 }
 
@@ -135,7 +135,7 @@ class _Orders extends StatelessWidget {
             children: [
             sectionTitle("File des ordonnances", icon: Icons.receipt_long_rounded),
             if (orders.isEmpty) const Empty("Aucune commande reçue.", icon: Icons.inbox_outlined),
-            for (var i = 0; i < orders.length; i++) _card(c, orders[i], i, reload),
+            ResponsiveGrid(children: [for (var i = 0; i < orders.length; i++) _card(c, orders[i], i, reload)]),
             const SizedBox(height: 20),
           ]),
         ),
@@ -231,7 +231,7 @@ class _Stock extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           if (stock.isEmpty) const Empty("Stock vide.", icon: Icons.inventory_2_outlined),
-          for (var i = 0; i < stock.length; i++)
+          ResponsiveGrid(children: [for (var i = 0; i < stock.length; i++)
             AppCard(
               index: i,
               onTap: () => _edit(c, stock[i], reload),
@@ -254,7 +254,7 @@ class _Stock extends StatelessWidget {
                     Text(tr("Stock faible"), style: const TextStyle(color: Color(0xFF8A5A00), fontWeight: FontWeight.w800)),
                   ]),
               ]),
-            ),
+            )]),
           const SizedBox(height: 20),
         ]),
       );
