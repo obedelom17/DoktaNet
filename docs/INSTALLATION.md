@@ -17,8 +17,14 @@ Le projet est déjà lié (`.neon`, `neon.ts` : service Postgres seul).
    - Sans données de test : `npm run db:schema`.
 Alternative sans CLI : coller la chaîne de connexion dans `.dev.vars` (`DATABASE_URL=`).
 
-## 2. Stockage des ordonnances (R2)
-Créer le bucket `doktanet-ordonnances`. Le binding `RX_BUCKET` est déclaré dans `wrangler.toml`.
+## 2. Stockage des ordonnances (R2) : optionnel
+R2 n'est pas utilisé par défaut : les ordonnances, leur signature et leur vérification sont dans Neon. Pour activer la copie JSON dans R2 : activer R2 dans le tableau de bord Cloudflare, créer le bucket `doktanet-ordonnances`, puis ajouter à `wrangler.toml` :
+```
+[[r2_buckets]]
+binding = "RX_BUCKET"
+bucket_name = "doktanet-ordonnances"
+```
+Sans ce bloc, le déploiement fonctionne normalement.
 
 ## 3. Variables (Cloudflare Pages > Settings > Variables)
 | Variable | Rôle |
