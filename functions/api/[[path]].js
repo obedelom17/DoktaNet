@@ -429,15 +429,28 @@ export async function onRequest({ request, env }) {
       if (!a || (a.patient_id !== user.id && a.doctor_id !== user.id)) throw new HttpError(404, 'Introuvable');
       let room = a.room_url;
       if (!room) {
-        room = `https://meet.jit.si/DoktaNet-${a.id}`;
+        // Nom de salle deterministe : medecin et patient arrivent toujours dans la meme salle.
+        room = `https://meet.jit.si/DoktaNet-${String(a.id).replace(/-/g, '')}`;
         if (env.DAILY_API_KEY) {
-          const r = await fetch('https://api.daily.co/v1/rooms', { method: 'POST',
-            headers: { 'content-type': 'application/json', authorization: `Bearer ${env.DAILY_API_KEY}` },
-            body: JSON.stringify({ name: `dk-${a.id.slice(0, 8)}`, properties: { exp: Math.floor(Date.now() / 1000) + 7200 } }) });
-          const j = await r.json();
-          if (j.url) room = j.url;
+          const dname = `dk-${String(a.id).replace(/-/g, '')}`.slice(0, 40);
+          const dh = { 'content-type': 'application/json', authorization: `Bearer ${env.DAILY_API_KEY}` };
+          let j = null;
+          try {
+            const r = await fetch('https://api.daily.co/v1/rooms', { method: 'POST', headers: dh,
+              body: JSON.stringify({ name: dname, properties: { exp: Math.floor(Date.now() / 1000) + 7200 } }) });
+            j = await r.json();
+            // Salle deja creee (appel simultane) : on la recupere au lieu de basculer sur Jitsi.
+            if (!j || !j.url) {
+              const g = await fetch(`https://api.daily.co/v1/rooms/${dname}`, { headers: dh });
+              j = await g.json();
+            }
+          } catch (_) { j = null; }
+          if (j && j.url) room = j.url;
         }
-        await q('update appointments set room_url=$2 where id=$1', [a.id, room]);
+        // Ecriture atomique : la premiere salle enregistree gagne, l'autre participant la reutilise.
+        await q('update appointments set room_url=$2 where id=$1 and room_url is null', [a.id, room]);
+        const [fresh] = await q('select room_url from appointments where id=$1', [a.id]);
+        if (fresh && fresh.room_url) room = fresh.room_url;
       }
       return json({ url: room });
     }
