@@ -140,12 +140,34 @@ class _PhotoBackdropState extends State<PhotoBackdrop> {
   Widget _stack() => DecoratedBox(
         decoration: const BoxDecoration(gradient: kHeroGradient),
         child: Stack(children: [
-          Positioned.fill(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 1400),
-              child: SizedBox.expand(key: ValueKey(_i), child: DkImage(widget.photos[_i])),
+          if ((_box?.width ?? 1000) < 700 && (_box?.height ?? 0) > (_box?.width ?? 0))
+            // Mobile portrait : photo moins zoomee (bande en haut), fondue vers le fond.
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              height: math.min(_box!.height * 0.62, _box!.width * 1.25),
+              child: ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (r) => const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.black, Colors.black, Colors.transparent],
+                  stops: [0, 0.7, 1],
+                ).createShader(r),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 1400),
+                  child: SizedBox.expand(key: ValueKey(_i), child: DkImage(widget.photos[_i])),
+                ),
+              ),
+            )
+          else
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 1400),
+                child: SizedBox.expand(key: ValueKey(_i), child: DkImage(widget.photos[_i])),
+              ),
             ),
-          ),
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
