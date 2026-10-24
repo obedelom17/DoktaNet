@@ -10,21 +10,34 @@
       "src": "icons/Icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "icons/Icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "icons/Icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/Icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
-  "description": "Téléconsultation et parcours de soins connectés au Togo. / Telehealth and connected care in Togo.",
+  "description": "Consultez un médecin en ligne, recevez votre ordonnance numérique et vos médicaments au Togo.",
   "id": "/",
   "scope": "/",
   "lang": "fr",
   "categories": [
     "health",
     "medical"
-  ]
+  ],
+  "orientation": "any"
 }

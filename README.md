@@ -51,3 +51,8 @@ Triage : niveau d'urgence, pistes (hypothèses), jamais de diagnostic ni de dose
 ## Photos et installation (PWA)
 - Photos : `assets/photos/` (4 images en 2 tailles, ~40 à 110 Ko chacune). Widgets dans `lib/photos.dart` : diaporama de la page de connexion, en-têtes d'accueil (patient, médecin, pharmacien), bandeaux des sections Médecins et Pharmacies. Pour changer une photo : remplacer les fichiers `nom_l.jpg` (grand écran, 1280 px) et `nom_s.jpg` (mobile, 720 px) et ajuster le cadrage dans `Photos`.
 - Installation : la fenêtre « Installer DoktaNet » est dans `web/index.html` (Chrome, Edge, Android : invite native ; iPhone/iPad : mode d'emploi Partager > Sur l'écran d'accueil). Elle s'affiche quelques secondes après le chargement, puis se rappelle au bout de 7 jours si elle est refusée. Le bouton « Installer l'application » de Mon compte la rouvre à tout moment.
+
+## Partage (OpenGraph) et icônes
+- `web/index.html` contient les balises Open Graph et Twitter (titre, description, image `web/og-image.jpg` 1200x630). Les adresses sont en dur sur `https://doktanet.pages.dev` : à remplacer par ton nom de domaine si tu en ajoutes un (`og:url`, `og:image`, `twitter:image`, `canonical`).
+- Pour voir l'aperçu : coller le lien dans WhatsApp, ou utiliser les débogueurs Facebook (developers.facebook.com/tools/debug) et LinkedIn (linkedin.com/post-inspector). Ces sites gardent l'ancien aperçu en cache : utiliser « Scrape again ».
+- Icônes d'installation : `web/icons/` (Icon-192/512 pour PC et Android, Icon-maskable-192/512 pour les icônes rondes d'Android, apple-touch-icon.png pour iPhone) et `web/favicon.png`. Elles se régénèrent à partir de `assets/images/logo_white.png`.

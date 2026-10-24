@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'common.dart';
 import 'i18n.dart';
+import 'pattern.dart';
 import 'theme.dart';
 
 /// Photo de l'interface : deux tailles (s = mobile, l = grand écran) et deux cadrages
@@ -12,24 +14,30 @@ class DkPhoto {
   final Alignment wide;
   /// Hauteur (0 à 1) du centre des visages dans l'image : sert à cadrer les bandeaux très larges.
   final double faceY;
-  const DkPhoto(this.name, this.narrow, this.wide, this.faceY);
+  /// Abscisse (0 à 1) du centre des visages.
+  final double faceX;
+  /// Zoom conseillé sur les visages dans les bandeaux de mobile.
+  final double zoom;
+  const DkPhoto(this.name, this.narrow, this.wide, this.faceX, this.faceY, this.zoom);
   String _p(String tier) => 'assets/photos/${name}_$tier.jpg';
   /// s = mobile (720 px), l = 1280 px, xl = résolution d'origine (grands écrans).
   String pathFor(double w, double h) => (w > 1300 || h > 1000) ? _p('xl') : ((w > 700 || h > 700) ? _p('l') : _p('s'));
 }
 
 class Photos {
-  static const team = DkPhoto('team', Alignment(0.0, -0.4), Alignment(0.0, -0.55), 0.27);
-  static const pharmacy = DkPhoto('pharmacy', Alignment(0.7, -0.3), Alignment(0.3, -0.55), 0.3);
-  static const consult = DkPhoto('consult', Alignment(0.2, -0.4), Alignment(0.1, -0.55), 0.3);
-  static const doctor = DkPhoto('doctor', Alignment(0.5, -0.4), Alignment(0.0, -0.6), 0.28);
+  static const team = DkPhoto('team', Alignment(0.0, -0.4), Alignment(0.0, -0.55), 0.50, 0.27, 1.3);
+  static const pharmacy = DkPhoto('pharmacy', Alignment(0.7, -0.3), Alignment(0.3, -0.55), 0.66, 0.30, 1.8);
+  static const consult = DkPhoto('consult', Alignment(0.2, -0.4), Alignment(0.1, -0.55), 0.55, 0.30, 1.8);
+  static const doctor = DkPhoto('doctor', Alignment(0.5, -0.4), Alignment(0.0, -0.6), 0.50, 0.28, 1.5);
   static const slides = [team, consult, pharmacy, doctor];
 }
 
 /// Image plein cadre (BoxFit.cover) avec fondu à l'affichage et choix automatique de la taille.
 class DkImage extends StatelessWidget {
   final DkPhoto photo;
-  const DkImage(this.photo, {super.key});
+  /// > 1 : agrandit l'image en gardant les visages en place (utile sur mobile).
+  final double zoom;
+  const DkImage(this.photo, {super.key, this.zoom = 1.0});
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
@@ -50,8 +58,9 @@ class DkImage extends StatelessWidget {
         } else {
           a = photo.wide;
         }
-        return Image.asset(
-          photo.pathFor(w, h),
+        final z = zoom < 1 ? 1.0 : zoom;
+        Widget img = Image.asset(
+          photo.pathFor(w * z, h * z),
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
@@ -68,6 +77,19 @@ class DkImage extends StatelessWidget {
                   child: child,
                 ),
         );
+        if (z > 1.0) {
+          const ir = 16 / 9;
+          final s = math.max(w / ir, h); // hauteur affichée de l'image (BoxFit.cover)
+          final sw = s * ir;
+          final fx = (w - sw) * (a.x + 1) / 2 + photo.faceX * sw;
+          final fy = (h - s) * (a.y + 1) / 2 + photo.faceY * s;
+          img = Transform.scale(
+            scale: z,
+            alignment: Alignment(((fx / w) * 2 - 1).clamp(-1.0, 1.0).toDouble(), ((fy / h) * 2 - 1).clamp(-1.0, 1.0).toDouble()),
+            child: img,
+          );
+        }
+        return img;
       });
 }
 
@@ -140,6 +162,12 @@ class _PhotoBackdropState extends State<PhotoBackdrop> {
               ),
             ),
           ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: RepaintBoundary(child: CustomPaint(painter: WaxPainter(color: Colors.white, opacity: 0.05, cell: 140))),
+            ),
+          ),
+          const Positioned(top: 0, left: 0, right: 0, child: KenteBar()),
           widget.child,
         ]),
       );
@@ -218,7 +246,7 @@ class PhotoHero extends StatelessWidget {
           Text(title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: wide ? 34 : 30, fontWeight: FontWeight.w800, color: Colors.white, height: 1.1)),
+              style: TextStyle(fontSize: wide ? 40 : 30, fontWeight: FontWeight.w800, color: Colors.white, height: 1.08)),
           if (subtitle != null)
             Padding(
               padding: const EdgeInsets.only(top: 6),
@@ -229,10 +257,10 @@ class PhotoHero extends StatelessWidget {
           if (panel != null) Padding(padding: const EdgeInsets.only(top: 16), child: panel!),
         ]);
         return Padding(
-          padding: wide ? const EdgeInsets.fromLTRB(16, 16, 16, 8) : EdgeInsets.zero,
+          padding: EdgeInsets.zero,
           child: Reveal(
             child: ClipRRect(
-              borderRadius: wide ? BorderRadius.circular(28) : const BorderRadius.vertical(bottom: Radius.circular(32)),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(36)),
               child: DecoratedBox(
                 decoration: BoxDecoration(color: wide ? null : cDark, gradient: wide ? kHeroGradient : null),
                 child: Stack(children: [
@@ -240,7 +268,7 @@ class PhotoHero extends StatelessWidget {
                   if (wide)
                     Positioned.fill(child: DkImage(photo))
                   else
-                    Positioned(top: 0, left: 0, right: 0, height: 300, child: DkImage(photo)),
+                    Positioned(top: 0, left: 0, right: 0, height: 300, child: DkImage(photo, zoom: 1 + (photo.zoom - 1) * 0.5)),
                   if (wide)
                     Positioned.fill(
                       child: DecoratedBox(
@@ -271,8 +299,13 @@ class PhotoHero extends StatelessWidget {
                         ),
                       ),
                     ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(painter: WaxRingsPainter(anchor: Alignment.bottomRight, maxRadius: wide ? 380 : 250)),
+                    ),
+                  ),
                   ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: wide ? (box.maxWidth * 0.24).clamp(300.0, 400.0).toDouble() : 0),
+                    constraints: BoxConstraints(minHeight: wide ? (box.maxWidth * 0.30).clamp(340.0, 480.0).toDouble() : 0),
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(wide ? 32 : 20, wide ? 26 : 16, wide ? 32 : 20, wide ? 26 : 24),
                       child: wide
@@ -302,14 +335,14 @@ class PhotoBanner extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
         final wide = box.maxWidth >= 700;
         return Padding(
-          padding: wide ? const EdgeInsets.fromLTRB(16, 16, 16, 0) : EdgeInsets.zero,
+          padding: EdgeInsets.zero,
           child: Reveal(
             child: ClipRRect(
-              borderRadius: wide ? BorderRadius.circular(24) : const BorderRadius.vertical(bottom: Radius.circular(28)),
+              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(32)),
               child: SizedBox(
-                height: wide ? (box.maxWidth * 0.2).clamp(180.0, 300.0).toDouble() : 160,
+                height: wide ? (box.maxWidth * 0.26).clamp(240.0, 420.0).toDouble() : 210,
                 child: Stack(children: [
-                  Positioned.fill(child: DkImage(photo)),
+                  Positioned.fill(child: DkImage(photo, zoom: wide ? 1.0 : photo.zoom)),
                   Positioned.fill(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
@@ -328,6 +361,11 @@ class PhotoBanner extends StatelessWidget {
                       ),
                     ),
                   ),
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: CustomPaint(painter: WaxRingsPainter(anchor: wide ? Alignment.bottomLeft : Alignment.bottomRight, maxRadius: 260)),
+                    ),
+                  ),
                   Align(
                     alignment: wide ? Alignment.centerLeft : Alignment.bottomLeft,
                     child: Padding(
@@ -335,7 +373,7 @@ class PhotoBanner extends StatelessWidget {
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 560),
                         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text(title, style: TextStyle(fontSize: wide ? 28 : 22, fontWeight: FontWeight.w800, color: Colors.white)),
+                          Text(title, style: TextStyle(fontSize: wide ? 34 : 24, fontWeight: FontWeight.w800, color: Colors.white)),
                           const SizedBox(height: 3),
                           Text(subtitle, style: TextStyle(fontSize: 14, height: 1.25, color: Colors.white.withOpacity(0.88))),
                         ]),
@@ -363,7 +401,7 @@ class HeroList extends StatelessWidget {
         children: [
           hero,
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            padding: EdgeInsets.fromLTRB(hPad(context), 8, hPad(context), 24),
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
           ),
         ],

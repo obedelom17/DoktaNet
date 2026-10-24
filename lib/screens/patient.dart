@@ -350,7 +350,7 @@ class _DoctorsState extends State<_Doctors> {
   Widget build(BuildContext context) => Column(children: [
         PhotoBanner(photo: Photos.team, title: tr("Trouvez votre médecin"), subtitle: tr("Des médecins validés par notre équipe, à portée de clic.")),
         Container(
-          margin: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          margin: EdgeInsets.fromLTRB(hPad(context), 16, hPad(context), 4),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -389,7 +389,7 @@ class _DoctorsState extends State<_Doctors> {
             load: () async => (await Api.get('/doctors', {'q': qc.text.trim(), 'city': cc.text.trim()})) as List,
             builder: (c, docs, _) => docs.isEmpty
                 ? ListView(padding: const EdgeInsets.all(16), children: const [Empty("Aucun médecin trouvé.", icon: Icons.person_search_outlined)])
-                : ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 16), children: [
+                : ListView(padding: EdgeInsets.fromLTRB(hPad(c), 12, hPad(c), 16), children: [
                     ResponsiveGrid(children: [for (var i = 0; i < docs.length; i++)
                       AppCard(
                         index: i,
@@ -657,7 +657,7 @@ class _PharmacyListState extends State<PharmacyList> {
   Widget build(BuildContext context) => Column(children: [
         PhotoBanner(photo: Photos.pharmacy, title: tr("Vos pharmacies partenaires"), subtitle: tr("Vérifiez la disponibilité de vos médicaments avant de vous déplacer.")),
         Container(
-          margin: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+          margin: EdgeInsets.fromLTRB(hPad(context), 16, hPad(context), 4),
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -686,7 +686,7 @@ class _PharmacyListState extends State<PharmacyList> {
             load: () async => (await Api.get('/pharmacies', {'city': cc.text.trim()})) as List,
             builder: (c, list, _) => list.isEmpty
                 ? ListView(padding: const EdgeInsets.all(16), children: const [Empty("Aucune pharmacie partenaire.", icon: Icons.storefront_outlined)])
-                : ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 16), children: [
+                : ListView(padding: EdgeInsets.fromLTRB(hPad(c), 12, hPad(c), 16), children: [
                     ResponsiveGrid(children: [for (var i = 0; i < list.length; i++)
                       AppCard(
                         index: i,

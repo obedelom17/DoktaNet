@@ -1,4 +1,5 @@
 import 'install.dart';
+import 'pattern.dart';
 import 'screens/account.dart';
 import 'dart:async';
 import 'dart:math' as math;
@@ -92,12 +93,8 @@ Widget chip(String s) {
 Widget sectionTitle(String t, {IconData? icon}) => Padding(
       padding: const EdgeInsets.only(top: 22, bottom: 12),
       child: Row(children: [
-        Container(
-          width: 5,
-          height: 22,
-          decoration: BoxDecoration(gradient: kGoldGradient, borderRadius: BorderRadius.circular(4)),
-        ),
-        const SizedBox(width: 10),
+        const DiamondTrio(),
+        const SizedBox(width: 8),
         if (icon != null) ...[Icon(icon, color: cMid, size: 22), const SizedBox(width: 8)],
         Expanded(
           child: Text(tr(t), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: cDark)),
@@ -902,7 +899,14 @@ class _ShellState extends State<Shell> {
           colors: [Color(0xFFE2EFF4), cBg],
         ),
       ),
-      child: ShellScope(go: go, child: page),
+      child: Stack(fit: StackFit.expand, children: [
+        const Positioned.fill(
+          child: IgnorePointer(
+            child: RepaintBoundary(child: CustomPaint(painter: WaxPainter(color: cMid, opacity: 0.045, cell: 150))),
+          ),
+        ),
+        ShellScope(go: go, child: page),
+      ]),
     );
     return Scaffold(
       appBar: AppBar(
@@ -910,6 +914,7 @@ class _ShellState extends State<Shell> {
         elevation: 0,
         scrolledUnderElevation: 0,
         toolbarHeight: 64,
+        bottom: const PreferredSize(preferredSize: Size.fromHeight(6), child: KenteBar()),
         flexibleSpace: Container(decoration: const BoxDecoration(gradient: kHeaderGradient)),
         titleSpacing: 16,
         title: Row(children: [
@@ -1031,3 +1036,7 @@ class ResponsiveGrid extends StatelessWidget {
         );
       });
 }
+
+
+/// Marge horizontale des pages : plus large sur grand écran.
+double hPad(BuildContext context) => MediaQuery.of(context).size.width >= 840 ? 28.0 : 16.0;
