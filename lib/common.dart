@@ -2,6 +2,7 @@ import 'install.dart';
 import 'pattern.dart';
 import 'screens/account.dart';
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -1022,8 +1023,14 @@ Future<void> openRoom(BuildContext c, String id) async {
     try {
       final r = await Api.post('/appointments/$id/room');
       var url = r['url'] as String;
-      if (audio && url.contains('meet.jit.si')) {
-        url += '#config.startAudioOnly=true&config.startWithVideoMuted=true';
+      if (url.contains('meet.jit.si')) {
+        // Reste dans le navigateur (pas d'appli a installer), saute la page de pre-connexion,
+        // prenom pre-rempli : un seul clic pour entrer dans la meme salle.
+        final name = '${session.user?['full_name'] ?? ''}'.trim();
+        final dn = name.isEmpty ? '' : '&userInfo.displayName=${Uri.encodeComponent(jsonEncode(name))}';
+        url += '#config.disableDeepLinking=true&config.prejoinConfig.enabled=false&config.prejoinPageEnabled=false'
+            '&config.startWithAudioMuted=false$dn';
+        if (audio) url += '&config.startAudioOnly=true&config.startWithVideoMuted=true';
       }
       if (pre != null) {
         pre!.location.href = url;

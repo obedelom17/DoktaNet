@@ -21,6 +21,7 @@ class _ThreadPageState extends State<ThreadPage> {
   final msgs = <Map<String, dynamic>>[];
   int last = 0;
   bool sending = false;
+  String? err;
   Timer? timer;
 
   String get me => '${session.user?['id']}';
@@ -49,14 +50,24 @@ class _ThreadPageState extends State<ThreadPage> {
   Future<void> _poll() async {
     try {
       final r = (await Api.get('/appointments/${widget.apptId}/messages', {'after': '$last'})) as List;
-      if (r.isEmpty || !mounted) return;
+      if (!mounted) return;
+      var changed = err != null;
+      err = null;
       for (final m in r) {
-        msgs.add(Map<String, dynamic>.from(m as Map));
-        last = int.parse('${m['id']}');
+        final mm = Map<String, dynamic>.from(m as Map);
+        final id = int.tryParse('${mm['id']}') ?? 0;
+        if (id <= last) continue;
+        msgs.add(mm);
+        last = id;
+        changed = true;
       }
-      setState(() {});
-      _down();
-    } catch (_) {}
+      if (changed) {
+        setState(() {});
+        _down();
+      }
+    } catch (e) {
+      if (mounted) setState(() => err = '$e');
+    }
   }
 
   Future<void> _send() async {
@@ -108,6 +119,13 @@ class _ThreadPageState extends State<ThreadPage> {
                 style: const TextStyle(fontSize: 13, color: Color(0xFF8A2F1C)),
               ),
             ),
+            if (err != null)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFFDE8E8),
+                padding: const EdgeInsets.all(8),
+                child: Text(tr("Erreur : {e}", {'e': err}), style: const TextStyle(fontSize: 12.5, color: Color(0xFF8A1C1C))),
+              ),
             Expanded(
               child: ListView(controller: scroll, padding: const EdgeInsets.all(16), children: [for (final m in msgs) _bubble(m)]),
             ),

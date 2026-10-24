@@ -604,8 +604,16 @@ export async function onRequest({ request, env }) {
       await q('delete from doctor_blocks where id=$1 and doctor_id=$2', [p.id, user.id]);
       return json({ ok: true });
     }
+    const ensureMsgTable = async () => {
+      await q(`create table if not exists appointment_messages (
+        id bigserial primary key,
+        appointment_id uuid not null references appointments(id) on delete cascade,
+        sender_id uuid not null references users(id),
+        content text not null, created_at timestamptz not null default now())`);
+    };
     if ((p = route('GET', '/appointments/:id/messages'))) {
       need('patient', 'doctor');
+      await ensureMsgTable();
       const [a] = await q('select patient_id, doctor_id from appointments where id=$1', [p.id]);
       if (!a || (a.patient_id !== user.id && a.doctor_id !== user.id)) throw new HttpError(404, 'Introuvable');
       return json(await q(`select m.id, m.sender_id, u.full_name sender_name, m.content, m.created_at from appointment_messages m
@@ -613,6 +621,7 @@ export async function onRequest({ request, env }) {
     }
     if ((p = route('POST', '/appointments/:id/messages'))) {
       need('patient', 'doctor');
+      await ensureMsgTable();
       const [a] = await q('select patient_id, doctor_id, status from appointments where id=$1', [p.id]);
       if (!a || (a.patient_id !== user.id && a.doctor_id !== user.id)) throw new HttpError(404, 'Introuvable');
       if (a.status === 'cancelled') throw new HttpError(400, 'Rendez-vous annulé');
