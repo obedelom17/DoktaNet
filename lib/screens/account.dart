@@ -26,6 +26,23 @@ class _AccountPageState extends State<AccountPage> {
   String _group(String s) =>
       [for (var i = 0; i < s.length; i += 4) s.substring(i, i + 4 > s.length ? s.length : i + 4)].join(' ');
 
+  Future<void> _changePhoto() => guard(context, () async {
+        final img = await pickAvatarDataUrl();
+        if (img == null) return;
+        await Api.post('/me/avatar', {'image': img});
+        await session.refresh();
+        if (mounted) {
+          setState(() {});
+          toast(context, tr("Photo mise à jour"));
+        }
+      });
+
+  Future<void> _removePhoto() => guard(context, () async {
+        await Api.post('/me/avatar/delete');
+        await session.refresh();
+        if (mounted) setState(() {});
+      });
+
   Future<void> _setup() => guard(context, () async {
         final r = await Api.post('/me/2fa/setup');
         if (mounted) setState(() => secret = '${r['secret']}');
@@ -102,6 +119,27 @@ class _AccountPageState extends State<AccountPage> {
                     style: const TextStyle(fontWeight: FontWeight.w700, color: cDark),
                   ),
                 ),
+              if (session.user?['role'] == 'doctor' || session.user?['role'] == 'pharmacy') ...[
+                sectionTitle("Photo de profil", icon: Icons.account_circle_outlined),
+                AppCard(
+                  child: Row(children: [
+                    InitialsAvatar('${session.user?['full_name']}',
+                        size: 72, userId: '${session.user?['id']}', ver: int.tryParse('${session.user?['avatar_v']}') ?? 0),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Wrap(spacing: 8, runSpacing: 8, children: [
+                        PrimaryButton("Changer la photo", icon: Icons.photo_camera_outlined, expand: false, onPressed: _changePhoto),
+                        if ((int.tryParse('${session.user?['avatar_v']}') ?? 0) > 0)
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: _removePhoto,
+                            label: Text(tr("Supprimer")),
+                          ),
+                      ]),
+                    ),
+                  ]),
+                ),
+              ],
               sectionTitle("Application", icon: Icons.install_mobile_rounded),
               AppCard(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

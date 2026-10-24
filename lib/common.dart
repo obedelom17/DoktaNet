@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:web/web.dart' as web;
@@ -180,9 +181,36 @@ class IconBadge extends StatelessWidget {
 class InitialsAvatar extends StatelessWidget {
   final String name;
   final double size;
-  const InitialsAvatar(this.name, {super.key, this.size = 48});
+  /// Photo de profil : id de l'utilisateur et version (avatar_v). Sans photo (ver 0), initiales.
+  final String? userId;
+  final int ver;
+  const InitialsAvatar(this.name, {super.key, this.size = 48, this.userId, this.ver = 0});
   @override
   Widget build(BuildContext context) {
+    final initials = _initials(context);
+    if (userId == null || ver <= 0) return initials;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: [BoxShadow(color: cMid.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: ClipOval(
+        child: Image.network(
+          Api.avatarUrl(userId!, ver),
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => initials,
+          loadingBuilder: (c, child, p) => p == null ? child : initials,
+        ),
+      ),
+    );
+  }
+
+  Widget _initials(BuildContext context) {
     final parts = name.trim().split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
     final ini = parts.isEmpty
         ? '?'
@@ -1069,6 +1097,19 @@ Future<void> openRoom(BuildContext c, String id) async {
       rethrow;
     }
   });
+}
+
+/// Choisit une photo (galerie ou appareil photo), la reduit et la renvoie en data URL.
+Future<String?> pickAvatarDataUrl() async {
+  final x = await ImagePicker().pickImage(source: ImageSource.gallery, maxWidth: 320, maxHeight: 320, imageQuality: 80);
+  if (x == null) return null;
+  final bytes = await x.readAsBytes();
+  if (bytes.length > 280000) throw ApiException('Image trop lourde');
+  final n = x.name.toLowerCase();
+  final mt = (x.mimeType != null && x.mimeType!.startsWith('image/'))
+      ? x.mimeType!
+      : (n.endsWith('.png') ? 'image/png' : (n.endsWith('.webp') ? 'image/webp' : 'image/jpeg'));
+  return 'data:$mt;base64,${base64Encode(bytes)}';
 }
 
 Future<void> openPrint(String id) => launchUrl(Api.printUrl(id), webOnlyWindowName: '_blank');

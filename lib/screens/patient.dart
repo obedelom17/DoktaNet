@@ -152,7 +152,7 @@ class _ApptCard extends StatelessWidget {
       index: i,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          InitialsAvatar('${a['doctor_name']}'),
+          InitialsAvatar('${a['doctor_name']}', userId: '${a['doctor_id']}', ver: int.tryParse('${a['doctor_avatar_v']}') ?? 0),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -406,7 +406,7 @@ class _DoctorsState extends State<_Doctors> {
                         index: i,
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Row(children: [
-                            InitialsAvatar('${docs[i]['full_name']}', size: 54),
+                            InitialsAvatar('${docs[i]['full_name']}', size: 54, userId: '${docs[i]['id']}', ver: int.tryParse('${docs[i]['avatar_v']}') ?? 0),
                             const SizedBox(width: 14),
                             Expanded(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -493,7 +493,7 @@ class _BookingPageState extends State<_BookingPage> {
         Reveal(
           child: AppCard(
             child: Row(children: [
-              InitialsAvatar('${widget.doc['full_name']}', size: 56),
+              InitialsAvatar('${widget.doc['full_name']}', size: 56, userId: '${widget.doc['id']}', ver: int.tryParse('${widget.doc['avatar_v']}') ?? 0),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -703,7 +703,9 @@ class _PharmacyListState extends State<PharmacyList> {
                         index: i,
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Row(children: [
-                            const IconBadge(Icons.local_pharmacy_rounded, gradient: kGoldGradient, size: 52),
+                            ((int.tryParse('${list[i]['avatar_v']}') ?? 0) > 0)
+                                ? InitialsAvatar('${list[i]['name']}', size: 52, userId: '${list[i]['id']}', ver: int.tryParse('${list[i]['avatar_v']}') ?? 0)
+                                : const IconBadge(Icons.local_pharmacy_rounded, gradient: kGoldGradient, size: 52),
                             const SizedBox(width: 14),
                             Expanded(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

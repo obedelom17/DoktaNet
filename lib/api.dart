@@ -34,6 +34,8 @@ class Api {
     return query == null ? full : full.replace(queryParameters: query);
   }
 
+  static String avatarUrl(String id, int v) => uri('/avatar/$id', {'v': '$v'}).toString();
+
   static Uri printUrl(String id) => uri('/prescriptions/$id/print', {'t': token ?? ''});
 
   static Future<dynamic> _send(String method, String path, {Map<String, String>? query, Object? body}) async {

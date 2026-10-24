@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 
 const enc = new TextEncoder();
+let avatarReady = false;
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const json = (d, s = 200) => new Response(JSON.stringify(d), { status: s, headers: { 'content-type': 'application/json' } });
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -164,6 +165,18 @@ export async function onRequest({ request, env }) {
       last_id bigint not null default 0,
       primary key (appointment_id, user_id))`);
   };
+  const ensureAvatar = async () => {
+    if (avatarReady) return;
+    await q('alter table users add column if not exists avatar text');
+    await q('alter table users add column if not exists avatar_v bigint not null default 0');
+    avatarReady = true;
+  };
+  const AVATAR_RE = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+  const saveAvatar = async (uid, img) => {
+    if (typeof img !== 'string' || !AVATAR_RE.test(img)) throw new HttpError(400, 'Image invalide (JPG, PNG ou WebP)');
+    if (img.length > 400000) throw new HttpError(400, 'Image trop lourde');
+    await q('update users set avatar=$2, avatar_v=$3 where id=$1', [uid, img, Date.now()]);
+  };
   const UNREAD = `(select count(*)::int from appointment_messages m where m.appointment_id=a.id and m.sender_id<>$1
     and m.id > coalesce((select r.last_id from appointment_reads r where r.appointment_id=a.id and r.user_id=$1),0)) unread`;
   let body = {};
@@ -315,6 +328,28 @@ export async function onRequest({ request, env }) {
     if (path === '/health') return json({ ok: true });
 
     // ---------- Auth ----------
+    if ((p = route('GET', '/avatar/:id'))) {
+      await ensureAvatar();
+      const [r] = await q('select avatar from users where id=$1', [p.id]);
+      const mt = r && r.avatar ? /^data:(image\/[a-z]+);base64,(.*)$/.exec(r.avatar) : null;
+      if (!mt) return new Response('Not found', { status: 404 });
+      const bin = atob(mt[2]);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return new Response(bytes, { headers: { 'content-type': mt[1], 'cache-control': 'public, max-age=31536000, immutable' } });
+    }
+    if (route('POST', '/me/avatar')) {
+      authed();
+      await ensureAvatar();
+      await saveAvatar(user.id, body.image);
+      return json({ ok: true });
+    }
+    if (route('POST', '/me/avatar/delete')) {
+      authed();
+      await ensureAvatar();
+      await q('update users set avatar=null, avatar_v=0 where id=$1', [user.id]);
+      return json({ ok: true });
+    }
     if (route('POST', '/auth/register')) {
       const { role, email, password, full_name, phone, consent } = body;
       if (!['patient', 'doctor', 'pharmacy'].includes(role)) throw new HttpError(400, 'Rôle invalide');
@@ -330,6 +365,7 @@ export async function onRequest({ request, env }) {
         [u.id, body.order_number, body.specialty || 'Médecine générale', body.city || null, Number(body.fee) || 5000]);
       if (role === 'pharmacy') await q('insert into pharmacy_profiles(user_id,name,license_number,city,address,phone) values($1,$2,$3,$4,$5,$6)',
         [u.id, body.pharmacy_name, body.license_number, body.city || null, body.address || null, phone || null]);
+      if (body.avatar && role !== 'patient') { await ensureAvatar(); try { await saveAvatar(u.id, body.avatar); } catch (_) {} }
       return json({ token: await signJwt({ sub: u.id }, env.JWT_SECRET) });
     }
     if (route('POST', '/auth/login')) {
@@ -350,7 +386,9 @@ export async function onRequest({ request, env }) {
       if (!user) throw new HttpError(401, 'Non connecté');
       const tbl = { patient: 'patient_profiles', doctor: 'doctor_profiles', pharmacy: 'pharmacy_profiles' }[user.role];
       const profile = tbl ? (await q(`select * from ${tbl} where user_id=$1`, [user.id]))[0] || {} : {};
-      return json({ ...user, profile, require_2fa: env.REQUIRE_2FA === '1' && ['doctor', 'admin'].includes(user.role) && !user.totp_enabled });
+      await ensureAvatar();
+      const [av] = await q('select avatar_v from users where id=$1', [user.id]);
+      return json({ ...user, avatar_v: Number(av?.avatar_v || 0), profile, require_2fa: env.REQUIRE_2FA === '1' && ['doctor', 'admin'].includes(user.role) && !user.totp_enabled });
     }
     if ((p = route('GET', '/verify/:code'))) {
       const [r] = await q('select r.*, du.full_name doctor_name from prescriptions r join users du on du.id=r.doctor_id where r.code=$1', [p.code]);
@@ -386,7 +424,8 @@ export async function onRequest({ request, env }) {
     // ---------- Médecins / RDV ----------
     if (route('GET', '/doctors')) {
       need();
-      return json(await q(`select u.id,u.full_name,d.specialty,d.city,d.fee,d.experience_years,d.languages,d.bio
+      await ensureAvatar();
+      return json(await q(`select u.id,u.full_name,u.avatar_v,d.specialty,d.city,d.fee,d.experience_years,d.languages,d.bio
         from users u join doctor_profiles d on d.user_id=u.id
         where u.role='doctor' and u.status='active'
           and ($1::text='' or u.full_name ilike '%'||$1::text||'%' or d.specialty ilike '%'||$1::text||'%')
@@ -423,7 +462,8 @@ export async function onRequest({ request, env }) {
     if (route('GET', '/appointments')) {
       need('patient', 'doctor');
       await ensureMsgTables();
-      if (user.role === 'patient') return json(await q('select a.*, ' + UNREAD + ', u.full_name doctor_name, d.specialty, d.fee from appointments a join users u on u.id=a.doctor_id join doctor_profiles d on d.user_id=a.doctor_id where a.patient_id=$1 order by a.starts_at desc', [user.id]));
+      await ensureAvatar();
+      if (user.role === 'patient') return json(await q('select a.*, ' + UNREAD + ', u.avatar_v doctor_avatar_v, u.full_name doctor_name, d.specialty, d.fee from appointments a join users u on u.id=a.doctor_id join doctor_profiles d on d.user_id=a.doctor_id where a.patient_id=$1 order by a.starts_at desc', [user.id]));
       return json(await q('select a.*, ' + UNREAD + ', u.full_name patient_name from appointments a join users u on u.id=a.patient_id where a.doctor_id=$1 order by a.starts_at', [user.id]));
     }
     if ((p = route('POST', '/appointments/:id/status'))) {
@@ -513,7 +553,8 @@ export async function onRequest({ request, env }) {
     // ---------- Pharmacies / commandes ----------
     if (route('GET', '/pharmacies')) {
       need('patient');
-      return json(await q(`select u.id, p.name, p.city, p.address, p.phone, p.lat, p.lng from users u join pharmacy_profiles p on p.user_id=u.id
+      await ensureAvatar();
+      return json(await q(`select u.id, u.avatar_v, p.name, p.city, p.address, p.phone, p.lat, p.lng from users u join pharmacy_profiles p on p.user_id=u.id
         where u.status='active' and ($1::text='' or p.city ilike '%'||$1::text||'%') order by p.name limit 50`, [url.searchParams.get('city') || '']));
     }
     if ((p = route('GET', '/pharmacies/:id/availability'))) {

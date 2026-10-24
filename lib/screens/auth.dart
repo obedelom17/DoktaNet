@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../api.dart';
 import '../common.dart';
@@ -16,6 +17,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   bool reg = false, busy = false, consent = false, showPwd = false, need2fa = false;
   String role = 'patient';
+  String? photo;
   final _c = <String, TextEditingController>{};
   TextEditingController c(String k) => _c.putIfAbsent(k, () => TextEditingController());
 
@@ -51,6 +53,7 @@ class _AuthScreenState extends State<AuthScreen> {
         'pharmacy_name': c('pname').text.trim(),
         'license_number': c('license').text.trim(),
         'address': c('address').text.trim(),
+        if (photo != null) 'avatar': photo,
       });
     });
     if (mounted) setState(() => busy = false);
@@ -232,6 +235,26 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               if (!reg && need2fa)
                 tf(c('code'), "Code 2FA (6 chiffres)", type: TextInputType.number, icon: Icons.shield_outlined),
+              if (reg && (role == 'doctor' || role == 'pharmacy'))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Row(children: [
+                    photo == null
+                        ? const CircleAvatar(radius: 32, backgroundColor: Color(0xFFE3EEF3), child: Icon(Icons.person_outline, size: 32, color: cMid))
+                        : CircleAvatar(radius: 32, backgroundImage: MemoryImage(base64Decode(photo!.split(',').last))),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.photo_camera_outlined),
+                        label: Text(tr(photo == null ? "Ajouter une photo de profil" : "Changer la photo")),
+                        onPressed: () => guard(context, () async {
+                          final img = await pickAvatarDataUrl();
+                          if (img != null && mounted) setState(() => photo = img);
+                        }),
+                      ),
+                    ),
+                  ]),
+                ),
               if (reg && role == 'doctor') ...[
                 tf(c('order'), "Numéro d'ordre des médecins", icon: Icons.badge_outlined),
                 tf(c('specialty'), "Spécialité (ex : Médecine générale)", icon: Icons.medical_information_outlined),
