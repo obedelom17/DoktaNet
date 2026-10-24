@@ -45,6 +45,7 @@ const Map<String, String> _en = {
   "Rejoindre la consultation": "Join the consultation",
   "Autorisez le micro et la caméra dans le navigateur. Connexion faible : choisissez Audio seul.": "Allow the microphone and camera in your browser. Weak connection: choose Audio only.",
   "Audio seul": "Audio only",
+  "Nouveau message reçu. Ouvrez Messages dans votre rendez-vous.": "New message received. Open Messages in your appointment.",
   "Vidéo": "Video",
   "Mon agenda des prochains jours": "My schedule for the next few days",
   "Résume le dossier de mon prochain patient": "Summarize my next patient's record",

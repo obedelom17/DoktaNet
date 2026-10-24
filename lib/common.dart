@@ -871,7 +871,34 @@ class Shell extends StatefulWidget {
 
 class _ShellState extends State<Shell> {
   int i = 0;
+  int unread = 0;
+  Timer? _unreadTimer;
   void go(int v) => setState(() => i = v);
+
+  @override
+  void initState() {
+    super.initState();
+    _checkUnread();
+    _unreadTimer = Timer.periodic(const Duration(seconds: 15), (_) => _checkUnread());
+  }
+
+  @override
+  void dispose() {
+    _unreadTimer?.cancel();
+    web.document.title = 'DoktaNet';
+    super.dispose();
+  }
+
+  Future<void> _checkUnread() async {
+    try {
+      final r = await Api.get('/me/unread');
+      final n = int.tryParse('${r['count']}') ?? 0;
+      if (!mounted) return;
+      if (n > unread) toast(context, tr("Nouveau message reçu. Ouvrez Messages dans votre rendez-vous."));
+      web.document.title = n > 0 ? '($n) DoktaNet' : 'DoktaNet';
+      if (n != unread) setState(() => unread = n);
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {

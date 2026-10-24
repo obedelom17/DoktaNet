@@ -152,6 +152,20 @@ export async function onRequest({ request, env }) {
   const m = request.method;
   const sql = neon(env.DATABASE_URL);
   const q = (t, p = []) => sql.query(t, p);
+  const ensureMsgTables = async () => {
+    await q(`create table if not exists appointment_messages (
+      id bigserial primary key,
+      appointment_id uuid not null references appointments(id) on delete cascade,
+      sender_id uuid not null references users(id),
+      content text not null, created_at timestamptz not null default now())`);
+    await q(`create table if not exists appointment_reads (
+      appointment_id uuid not null references appointments(id) on delete cascade,
+      user_id uuid not null references users(id) on delete cascade,
+      last_id bigint not null default 0,
+      primary key (appointment_id, user_id))`);
+  };
+  const UNREAD = `(select count(*)::int from appointment_messages m where m.appointment_id=a.id and m.sender_id<>$1
+    and m.id > coalesce((select r.last_id from appointment_reads r where r.appointment_id=a.id and r.user_id=$1),0)) unread`;
   let body = {};
   if (m !== 'GET' && m !== 'HEAD') { try { body = await request.json(); } catch { body = {}; } }
 
@@ -408,8 +422,9 @@ export async function onRequest({ request, env }) {
     }
     if (route('GET', '/appointments')) {
       need('patient', 'doctor');
-      if (user.role === 'patient') return json(await q('select a.*, u.full_name doctor_name, d.specialty, d.fee from appointments a join users u on u.id=a.doctor_id join doctor_profiles d on d.user_id=a.doctor_id where a.patient_id=$1 order by a.starts_at desc', [user.id]));
-      return json(await q('select a.*, u.full_name patient_name from appointments a join users u on u.id=a.patient_id where a.doctor_id=$1 order by a.starts_at', [user.id]));
+      await ensureMsgTables();
+      if (user.role === 'patient') return json(await q('select a.*, ' + UNREAD + ', u.full_name doctor_name, d.specialty, d.fee from appointments a join users u on u.id=a.doctor_id join doctor_profiles d on d.user_id=a.doctor_id where a.patient_id=$1 order by a.starts_at desc', [user.id]));
+      return json(await q('select a.*, ' + UNREAD + ', u.full_name patient_name from appointments a join users u on u.id=a.patient_id where a.doctor_id=$1 order by a.starts_at', [user.id]));
     }
     if ((p = route('POST', '/appointments/:id/status'))) {
       need('patient', 'doctor');
@@ -604,24 +619,29 @@ export async function onRequest({ request, env }) {
       await q('delete from doctor_blocks where id=$1 and doctor_id=$2', [p.id, user.id]);
       return json({ ok: true });
     }
-    const ensureMsgTable = async () => {
-      await q(`create table if not exists appointment_messages (
-        id bigserial primary key,
-        appointment_id uuid not null references appointments(id) on delete cascade,
-        sender_id uuid not null references users(id),
-        content text not null, created_at timestamptz not null default now())`);
-    };
     if ((p = route('GET', '/appointments/:id/messages'))) {
       need('patient', 'doctor');
-      await ensureMsgTable();
+      await ensureMsgTables();
       const [a] = await q('select patient_id, doctor_id from appointments where id=$1', [p.id]);
       if (!a || (a.patient_id !== user.id && a.doctor_id !== user.id)) throw new HttpError(404, 'Introuvable');
-      return json(await q(`select m.id, m.sender_id, u.full_name sender_name, m.content, m.created_at from appointment_messages m
-        join users u on u.id=m.sender_id where m.appointment_id=$1 and m.id>$2 order by m.id limit 200`, [p.id, parseInt(url.searchParams.get('after')) || 0]));
+      const rows = await q(`select m.id, m.sender_id, u.full_name sender_name, m.content, m.created_at from appointment_messages m
+        join users u on u.id=m.sender_id where m.appointment_id=$1 and m.id>$2 order by m.id limit 200`, [p.id, parseInt(url.searchParams.get('after')) || 0]);
+      const [mx] = await q('select coalesce(max(id),0) mx from appointment_messages where appointment_id=$1', [p.id]);
+      await q(`insert into appointment_reads(appointment_id,user_id,last_id) values($1,$2,$3)
+        on conflict (appointment_id,user_id) do update set last_id=greatest(appointment_reads.last_id, excluded.last_id)`, [p.id, user.id, mx.mx]);
+      return json(rows);
+    }
+    if (route('GET', '/me/unread')) {
+      need('patient', 'doctor');
+      await ensureMsgTables();
+      const [r] = await q(`select count(*)::int n from appointment_messages m join appointments a on a.id=m.appointment_id
+        where (a.patient_id=$1 or a.doctor_id=$1) and m.sender_id<>$1 and a.status<>'cancelled'
+        and m.id > coalesce((select r.last_id from appointment_reads r where r.appointment_id=a.id and r.user_id=$1),0)`, [user.id]);
+      return json({ count: r.n });
     }
     if ((p = route('POST', '/appointments/:id/messages'))) {
       need('patient', 'doctor');
-      await ensureMsgTable();
+      await ensureMsgTables();
       const [a] = await q('select patient_id, doctor_id, status from appointments where id=$1', [p.id]);
       if (!a || (a.patient_id !== user.id && a.doctor_id !== user.id)) throw new HttpError(404, 'Introuvable');
       if (a.status === 'cancelled') throw new HttpError(400, 'Rendez-vous annulé');

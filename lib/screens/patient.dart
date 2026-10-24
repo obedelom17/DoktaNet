@@ -168,9 +168,20 @@ class _ApptCard extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               icon: const Icon(Icons.forum_outlined),
-              onPressed: () => Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => ThreadPage(apptId: '${a['id']}', title: 'Dr ${a['doctor_name']}'))),
-              label: Text(tr("Messages")),
+              onPressed: () async {
+                  await Navigator.push(context, MaterialPageRoute(builder: (_) => ThreadPage(apptId: '${a['id']}', title: 'Dr ${a['doctor_name']}')));
+                  reload();
+              },
+              label: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(tr("Messages"), style: TextStyle(fontWeight: (int.tryParse('${a['unread']}') ?? 0) > 0 ? FontWeight.w800 : null)),
+                if ((int.tryParse('${a['unread']}') ?? 0) > 0)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(color: const Color(0xFFE5484D), borderRadius: BorderRadius.circular(12)),
+                    child: Text('${a['unread']}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
+                  ),
+              ]),
             ),
           ),
         if (active)
