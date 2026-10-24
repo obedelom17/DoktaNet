@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:web/web.dart' as web;
 import 'api.dart';
 import 'i18n.dart';
 import 'session.dart';
@@ -979,25 +980,60 @@ class _ShellState extends State<Shell> {
 }
 
 Future<void> openRoom(BuildContext c, String id) async {
+  // iOS/Android bloquent window.open apres un await : on ouvre l'onglet
+  // immediatement au clic, puis on lui donne l'adresse une fois connue.
+  web.Window? pre;
+  web.Window? preOpen() {
+    try {
+      return web.window.open('about:blank', '_blank');
+    } catch (_) {
+      return null;
+    }
+  }
+
   final audio = await showDialog<bool>(
     context: c,
     builder: (d) => AlertDialog(
       title: Text(tr("Rejoindre la consultation")),
       content: Text(tr("Autorisez le micro et la caméra dans le navigateur. Connexion faible : choisissez Audio seul.")),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(d, true), child: Text(tr("Audio seul"))),
-        ElevatedButton(onPressed: () => Navigator.pop(d, false), child: Text(tr("Vidéo"))),
+        TextButton(
+          onPressed: () {
+            pre = preOpen();
+            Navigator.pop(d, true);
+          },
+          child: Text(tr("Audio seul")),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            pre = preOpen();
+            Navigator.pop(d, false);
+          },
+          child: Text(tr("Vidéo")),
+        ),
       ],
     ),
   );
-  if (audio == null || !c.mounted) return;
+  if (audio == null || !c.mounted) {
+    pre?.close();
+    return;
+  }
   await guard(c, () async {
-    final r = await Api.post('/appointments/$id/room');
-    var url = r['url'] as String;
-    if (audio && url.contains('meet.jit.si')) {
-      url += '#config.startAudioOnly=true&config.startWithVideoMuted=true';
+    try {
+      final r = await Api.post('/appointments/$id/room');
+      var url = r['url'] as String;
+      if (audio && url.contains('meet.jit.si')) {
+        url += '#config.startAudioOnly=true&config.startWithVideoMuted=true';
+      }
+      if (pre != null) {
+        pre!.location.href = url;
+      } else {
+        await launchUrl(Uri.parse(url), webOnlyWindowName: '_self');
+      }
+    } catch (e) {
+      pre?.close();
+      rethrow;
     }
-    await launchUrl(Uri.parse(url), webOnlyWindowName: '_blank');
   });
 }
 

@@ -240,7 +240,7 @@ class PhotoHero extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
         final wide = box.maxWidth >= 700;
         final content = Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          SizedBox(height: wide ? 4 : 150),
+          SizedBox(height: wide ? 4 : 110),
           Text(kicker, style: TextStyle(fontSize: 15, color: Colors.white.withOpacity(0.88))),
           const SizedBox(height: 2),
           Text(title,
@@ -268,7 +268,7 @@ class PhotoHero extends StatelessWidget {
                   if (wide)
                     Positioned.fill(child: DkImage(photo))
                   else
-                    Positioned(top: 0, left: 0, right: 0, height: 300, child: DkImage(photo, zoom: 1 + (photo.zoom - 1) * 0.5)),
+                    Positioned(top: 0, left: 0, right: 0, height: 300, child: ClipRect(child: DkImage(photo, zoom: 1 + (photo.zoom - 1) * 0.5))),
                   if (wide)
                     Positioned.fill(
                       child: DecoratedBox(
@@ -287,14 +287,14 @@ class PhotoHero extends StatelessWidget {
                       top: 0,
                       left: 0,
                       right: 0,
-                      height: 312,
+                      height: 301,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: [cDark.withOpacity(0.05), cDark.withOpacity(0.35), cDark],
-                            stops: const [0, 0.45, 1],
+                            colors: [cDark.withOpacity(0.05), cDark.withOpacity(0.55), cDark, cDark],
+                            stops: const [0, 0.4, 0.85, 1],
                           ),
                         ),
                       ),
